@@ -120,7 +120,7 @@ foreach(TRANS_TYPE ${TRANSPORT_TYPES})
         if(UCLIENT_PLATFORM_POSIX)
             set(${TRANS_TYPE}_SRCS
                 src/c/profile/transport/${TT}/${TT}_transport.c
-                src/c/profile/transport/${TT}/${TT}_transport_linux.c
+                src/c/profile/transport/${TT}/${TT}_transport_posix.c
                 )
         elseif(UCLIENT_PLATFORM_WINDOWS)
             set(${TRANS_TYPE}_SRCS
@@ -138,7 +138,7 @@ endif()
 # Transport discovery source.
 if(PROFILE_DISCOVERY)
     if(UCLIENT_PLATFORM_POSIX)
-        set(UDP_DISCOVERY_SRCS src/c/profile/discovery/transport/udp_transport_datagram_linux.c)
+        set(UDP_DISCOVERY_SRCS src/c/profile/discovery/transport/udp_transport_datagram_posix.c)
     elseif(UCLIENT_PLATFORM_WINDOWS)
         set(UDP_DISCOVERY_SRCS src/c/profile/discovery/transport/udp_transport_datagram_windows.c)
     endif()
