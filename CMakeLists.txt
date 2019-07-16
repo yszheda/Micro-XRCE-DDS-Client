@@ -99,14 +99,16 @@ find_package(microcdr 1.1.0 EXACT REQUIRED PATHS ${PROJECT_BINARY_DIR}/temp_inst
 ###############################################################################
 # Check platform.
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(PLATFORM_NAME_LINUX ON)
+    set(UCLIENT_PLATFORM_LINUX ON)
+    set(UCLIENT_PLATFORM_POSIX ON)
     set(TRANSPORT_TYPES "UDP" "TCP" "SERIAL")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set(PLATFORM_NAME_WINDOWS ON)
+    set(UCLIENT_PLATFORM_WINDOWS ON)
     set(TRANSPORT_TYPES "UDP" "TCP")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Generic")
     if(PLATFORM_NAME STREQUAL "nuttx")
-        set(PLATFORM_NAME_NUTTX ON)
+        set(UCLIENT_NUTTX_PLATFORM ON)
+        set(UCLIENT_PLATFORM_POSIX ON)
         set(TRANSPORT_TYPES "UDP" "TCP" "SERIAL")
     endif()
 endif()
@@ -115,20 +117,15 @@ endif()
 foreach(TRANS_TYPE ${TRANSPORT_TYPES})
     if(PROFILE_${TRANS_TYPE}_TRANSPORT)
         string(TOLOWER ${TRANS_TYPE} TT)
-        if(PLATFORM_NAME_LINUX)
+        if(UCLIENT_PLATFORM_POSIX)
             set(${TRANS_TYPE}_SRCS
                 src/c/profile/transport/${TT}/${TT}_transport.c
                 src/c/profile/transport/${TT}/${TT}_transport_linux.c
                 )
-        elseif(PLATFORM_NAME_WINDOWS)
+        elseif(UCLIENT_PLATFORM_WINDOWS)
             set(${TRANS_TYPE}_SRCS
                 src/c/profile/transport/${TT}/${TT}_transport.c
                 src/c/profile/transport/${TT}/${TT}_transport_windows.c
-                )
-        elseif(PLATFORM_NAME_NUTTX)
-            set(${TRANS_TYPE}_SRCS
-                src/c/profile/transport/${TT}/${TT}_transport.c
-                src/c/profile/transport/${TT}/${TT}_transport_linux.c
                 )
         endif()
     endif()
@@ -140,12 +137,10 @@ endif()
 
 # Transport discovery source.
 if(PROFILE_DISCOVERY)
-    if(PLATFORM_NAME_LINUX)
+    if(UCLIENT_PLATFORM_POSIX)
         set(UDP_DISCOVERY_SRCS src/c/profile/discovery/transport/udp_transport_datagram_linux.c)
-    elseif(PLATFORM_NAME_WINDOWS)
+    elseif(UCLIENT_PLATFORM_WINDOWS)
         set(UDP_DISCOVERY_SRCS src/c/profile/discovery/transport/udp_transport_datagram_windows.c)
-    elseif(PLATFORM_NAME_NUTTX)
-        set(UDP_DISCOVERY_SRCS src/c/profile/discovery/transport/udp_transport_datagram_linux.c)
     endif()
 endif()
 
@@ -280,12 +275,12 @@ if(UCLIENT_BUILD_TESTS)
     include(CTest)
 
     add_subdirectory(test/unitary)
-    if(PLATFORM_NAME_LINUX)
+    if(UCLIENT_PLATFORM_LINUX)
         add_subdirectory(test/transport/serial_comm)
     endif()
 endif()
 
-if(PLATFORM_NAME_LINUX AND UCLIENT_MEMORY_TESTS)
+if(UCLIENT_PLATFORM_LINUX AND UCLIENT_MEMORY_TESTS)
     add_subdirectory(test/memory/consumption)
 endif()
 
