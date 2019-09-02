@@ -481,7 +481,7 @@ bool listen_message(
     if(must_be_read)
     {
         ucdrStream us;
-        ucdr_init_buffer(&us, data, (uint32_t)length);
+        ucdr_init_stream(&us, data, (uint32_t)length);
         read_message(session, &us);
     }
 
@@ -578,42 +578,37 @@ void write_submessage_heartbeat(
         const uxrSession* session,
         uxrStreamId id)
 {
-    uint8_t heartbeat_buffer[HEARTBEAT_MAX_MSG_SIZE];
+    uint8_t buffer[HEARTBEAT_MAX_MSG_SIZE];
     ucdrStream us;
-    ucdr_init_buffer_offset(&us, heartbeat_buffer, HEARTBEAT_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
+    ucdr_init_stream(&us, buffer, sizeof(buffer));
 
     const uxrOutputReliableStream* stream = &session->streams.output_reliable[id.index];
 
-    /* Buffer submessage header. */
+    uxr_serialize_message_header(&us, session->info.id, 0, 0, session->info.key);
     uxr_buffer_submessage_header(&us, SUBMESSAGE_ID_HEARTBEAT, HEARTBEAT_PAYLOAD_SIZE, 0);
 
-    /* Buffer HEARTBEAT. */
     HEARTBEAT_Payload payload;
     payload.first_unacked_seq_nr = uxr_seq_num_add(stream->last_acknown, 1);
     payload.last_unacked_seq_nr = stream->last_sent;
     payload.stream_id = id.raw;
     (void) uxr_serialize_HEARTBEAT_Payload(&us, &payload);
 
-    /* Stamp message header. */
-// TODO (julian): refactor to ucdrStream.
-//    uxr_stamp_session_header(&session->info, 0, 0, us.init);
-    send_message(session, heartbeat_buffer, ucdr_buffer_length(&us));
+    send_message(session, buffer, ucdr_used_size(&us));
 }
 
 void write_submessage_acknack(
         const uxrSession* session,
         uxrStreamId id)
 {
-    uint8_t acknack_buffer[ACKNACK_MAX_MSG_SIZE];
+    uint8_t buffer[ACKNACK_MAX_MSG_SIZE];
     ucdrStream us;
-    ucdr_init_buffer_offset(&us, acknack_buffer, ACKNACK_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
+    ucdr_init_stream(&us, buffer, sizeof(buffer));
 
     const uxrInputReliableStream* stream = &session->streams.input_reliable[id.index];
 
-    /* Buffer submessage header. */
+    uxr_serialize_message_header(&us, session->info.id, 0, 0, session->info.key);
     uxr_buffer_submessage_header(&us, SUBMESSAGE_ID_ACKNACK, ACKNACK_PAYLOAD_SIZE, 0);
 
-    /* Buffer ACKNACK. */
     ACKNACK_Payload payload;
     uint16_t nack_bitmap = uxr_compute_acknack(stream, &payload.first_unacked_seq_num);
     payload.nack_bitmap[0] = (uint8_t)(nack_bitmap >> 8);
@@ -621,10 +616,7 @@ void write_submessage_acknack(
     payload.stream_id = id.raw;
     (void) uxr_serialize_ACKNACK_Payload(&us, &payload);
 
-    /* Stamp message header. */
-// TODO (julian): refactor to ucdrStream.
-//    uxr_stamp_session_header(&session->info, 0, 0, us.init);
-    send_message(session, acknack_buffer, ucdr_buffer_length(&us));
+    send_message(session, buffer, ucdr_used_size(&us));
 }
 
 void read_message(uxrSession* session, ucdrStream* us)
