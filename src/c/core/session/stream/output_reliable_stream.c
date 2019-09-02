@@ -11,12 +11,18 @@
 #define MIN_HEARTBEAT_TIME_INTERVAL ((int64_t) UXR_CONFIG_MIN_HEARTBEAT_TIME_INTERVAL) // ms
 #define MAX_HEARTBEAT_TRIES         (sizeof(int64_t) * 8 - 1)
 
-static bool on_full_output_buffer(ucdrBuffer* ub, void* args);
+//static bool on_full_output_buffer(ucdrStream* us, void* args);
 
 //==================================================================
 //                             PUBLIC
 //==================================================================
-void uxr_init_output_reliable_stream(uxrOutputReliableStream* stream, uint8_t* buffer, size_t size, uint16_t history, uint8_t header_offset, OnNewFragment on_new_fragment)
+void uxr_init_output_reliable_stream(
+        uxrOutputReliableStream* stream,
+        uint8_t* buffer,
+        size_t size,
+        uint16_t history,
+        uint8_t header_offset,
+        OnNewFragment on_new_fragment)
 {
     // assert for history (must be 2^)
 
@@ -29,7 +35,8 @@ void uxr_init_output_reliable_stream(uxrOutputReliableStream* stream, uint8_t* b
     uxr_reset_output_reliable_stream(stream);
 }
 
-void uxr_reset_output_reliable_stream(uxrOutputReliableStream* stream)
+void uxr_reset_output_reliable_stream(
+        uxrOutputReliableStream* stream)
 {
     for(size_t i = 0; i < stream->history; i++)
     {
@@ -46,7 +53,11 @@ void uxr_reset_output_reliable_stream(uxrOutputReliableStream* stream)
     stream->send_lost = false;
 }
 
-bool uxr_prepare_reliable_buffer_to_write(uxrOutputReliableStream* stream, size_t length, size_t fragment_offset, ucdrBuffer* ub)
+bool uxr_prepare_reliable_buffer_to_write(
+        uxrOutputReliableStream* stream,
+        size_t length,
+        size_t fragment_offset,
+        ucdrStream* us)
 {
     bool available_to_write = false;
     size_t block_size = uxr_get_output_buffer_size(stream);
@@ -64,7 +75,8 @@ bool uxr_prepare_reliable_buffer_to_write(uxrOutputReliableStream* stream, size_
         {
             size_t future_length = initial_length + length;
             uxr_set_reliable_buffer_length(initial_buffer, future_length);
-            ucdr_init_buffer_offset(ub, initial_buffer, (uint32_t)future_length, (uint32_t)initial_length);
+// TODO (julian): refactor to ucdrStream.
+//            ucdr_init_buffer_offset(us, initial_buffer, (uint32_t)future_length, (uint32_t)initial_length);
         }
     }
     /* Check if the message fit in a new empty buffer */
@@ -80,7 +92,8 @@ bool uxr_prepare_reliable_buffer_to_write(uxrOutputReliableStream* stream, size_
             uint8_t* buffer = uxr_get_output_buffer(stream, next % stream->history);
             size_t future_length = stream->offset + length;
             uxr_set_reliable_buffer_length(buffer, future_length);
-            ucdr_init_buffer_offset(ub, buffer, (uint32_t)future_length, stream->offset);
+// TODO (julian): refactor to ucdrStream.
+//            ucdr_init_buffer_offset(us, buffer, (uint32_t)future_length, stream->offset);
         }
     }
     /* Check if the message fit in a fragmented message */
@@ -118,9 +131,10 @@ bool uxr_prepare_reliable_buffer_to_write(uxrOutputReliableStream* stream, size_
             uint8_t* final_buffer = uxr_get_output_buffer(stream, stream->last_written % stream->history);
             uxr_set_reliable_buffer_length(final_buffer, stream->offset + fragment_offset + last_fragment_size);
 
-            ucdr_init_buffer_offset(ub, initial_buffer, (uint32_t)block_size, (uint32_t)initial_length);
-            ucdr_set_on_full_buffer_callback(ub, on_full_output_buffer, stream);
-            stream->on_new_fragment(ub, stream);
+// TODO (julian): refactor to ucdrStream.
+//            ucdr_init_buffer_offset(us, initial_buffer, (uint32_t)block_size, (uint32_t)initial_length);
+//            ucdr_set_on_full_buffer_callback(us, on_full_output_buffer, stream);
+//            stream->on_new_fragment(us, stream);
         }
     }
 
@@ -242,19 +256,19 @@ size_t uxr_get_output_buffer_size(const uxrOutputReliableStream* stream)
 //==================================================================
 //                             PRIVATE
 //==================================================================
-bool on_full_output_buffer(ucdrBuffer* ub, void* args)
-{
-    uxrOutputReliableStream* stream = (uxrOutputReliableStream*) args;
-
-    size_t slot = (size_t)(ub->init - stream->buffer) / (stream->size / stream->history);
-    uint8_t* next_buffer = uxr_get_output_buffer(stream, (slot + 1) % stream->history);
-    size_t next_length = uxr_get_reliable_buffer_length(next_buffer);
-
-    ucdr_init_buffer_offset(ub, next_buffer, (uint32_t)next_length, stream->offset);
-    ucdr_set_on_full_buffer_callback(ub, on_full_output_buffer, stream);
-
-    stream->on_new_fragment(ub, stream);
-
-    return false;
-}
+//bool on_full_output_buffer(ucdrStream* us, void* args)
+//{
+//    uxrOutputReliableStream* stream = (uxrOutputReliableStream*) args;
+//
+//    size_t slot = (size_t)(us->init - stream->buffer) / (stream->size / stream->history);
+//    uint8_t* next_buffer = uxr_get_output_buffer(stream, (slot + 1) % stream->history);
+//    size_t next_length = uxr_get_reliable_buffer_length(next_buffer);
+//
+//    ucdr_init_buffer_offset(us, next_buffer, (uint32_t)next_length, stream->offset);
+//    ucdr_set_on_full_buffer_callback(us, on_full_output_buffer, stream);
+//
+//    stream->on_new_fragment(us, stream);
+//
+//    return false;
+//}
 

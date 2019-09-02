@@ -24,10 +24,10 @@ typedef struct CallbackData
 
 } CallbackData;
 
-static void write_get_info_message(ucdrBuffer* ub);
+static void write_get_info_message(ucdrStream* us);
 static bool listen_info_message(uxrUDPTransportDatagram* transport, int period, CallbackData* callback);
-static bool read_info_headers(ucdrBuffer* ub);
-static bool read_info_message(ucdrBuffer* ub, CallbackData* callback);
+static bool read_info_headers(ucdrStream* us);
+static bool read_info_message(ucdrStream* us, CallbackData* callback);
 static bool process_info(CallbackData* callback, TransportLocator* transport);
 
 //==================================================================
@@ -57,10 +57,10 @@ void uxr_discovery_agents(
     callback.args = args;
 
     uint8_t output_buffer[UXR_UDP_TRANSPORT_MTU_DATAGRAM];
-    ucdrBuffer ub;
-    ucdr_init_buffer(&ub, output_buffer, UXR_UDP_TRANSPORT_MTU_DATAGRAM);
-    write_get_info_message(&ub);
-    size_t message_length = ucdr_buffer_length(&ub);
+    ucdrStream us;
+    ucdr_init_buffer(&us, output_buffer, UXR_UDP_TRANSPORT_MTU_DATAGRAM);
+    write_get_info_message(&us);
+    size_t message_length = ucdr_buffer_length(&us);
 
     uxrUDPTransportDatagram transport;
     if(uxr_init_udp_transport_datagram(&transport))
@@ -88,16 +88,16 @@ void uxr_discovery_agents(
 //                             INTERNAL
 //==================================================================
 
-void write_get_info_message(ucdrBuffer* ub)
+void write_get_info_message(ucdrStream* us)
 {
     GET_INFO_Payload payload;
     payload.base.request_id = (RequestId){{0x00, GET_INFO_REQUEST_ID}};
     payload.base.object_id = OBJECTID_AGENT;
     payload.info_mask = INFO_CONFIGURATION | INFO_ACTIVITY;
 
-    uxr_serialize_message_header(ub, SESSION_ID_WITHOUT_CLIENT_KEY, 0, 0, 0);
-    (void) uxr_buffer_submessage_header(ub, SUBMESSAGE_ID_GET_INFO, GET_INFO_MSG_SIZE, 0);
-    (void) uxr_serialize_GET_INFO_Payload(ub, &payload);
+    uxr_serialize_message_header(us, SESSION_ID_WITHOUT_CLIENT_KEY, 0, 0, 0);
+    (void) uxr_buffer_submessage_header(us, SUBMESSAGE_ID_GET_INFO, GET_INFO_MSG_SIZE, 0);
+    (void) uxr_serialize_GET_INFO_Payload(us, &payload);
 }
 
 bool listen_info_message(
@@ -112,34 +112,34 @@ bool listen_info_message(
     {
         UXR_DEBUG_PRINT_MESSAGE(UXR_RECV, input_buffer, length, 0);
 
-        ucdrBuffer ub;
-        ucdr_init_buffer(&ub, input_buffer, (uint32_t)length);
-        if(read_info_headers(&ub))
+        ucdrStream us;
+        ucdr_init_buffer(&us, input_buffer, (uint32_t)length);
+        if(read_info_headers(&us))
         {
-            (void) read_info_message(&ub, callback);
+            (void) read_info_message(&us, callback);
         }
     }
 
     return received;
 }
 
-bool read_info_headers(ucdrBuffer* ub)
+bool read_info_headers(ucdrStream* us)
 {
     uint8_t session_id; uint8_t stream_id_raw; uxrSeqNum seq_num; uint8_t key[CLIENT_KEY_SIZE];
-    uxr_deserialize_message_header(ub, &session_id, &stream_id_raw, &seq_num, key);
+    uxr_deserialize_message_header(us, &session_id, &stream_id_raw, &seq_num, key);
 
     uint8_t id; uint16_t length; uint8_t flags;
-    return uxr_read_submessage_header(ub, &id, &length, &flags);
+    return uxr_read_submessage_header(us, &id, &length, &flags);
 }
 
 bool read_info_message(
-        ucdrBuffer* ub,
+        ucdrStream* us,
         CallbackData* callback)
 {
     bool well_read = false;
     INFO_Payload payload;
 
-    if(uxr_deserialize_INFO_Payload(ub, &payload))
+    if(uxr_deserialize_INFO_Payload(us, &payload))
     {
         XrceVersion* version = &payload.object_info.config._.agent.xrce_version;
         TransportLocator* transport = &payload.object_info.activity._.agent.address_seq.data[0];

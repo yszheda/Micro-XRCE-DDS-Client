@@ -7,7 +7,7 @@
 
 extern void read_submessage_format(
         uxrSession* session,
-        ucdrBuffer* data,
+        ucdrStream* data,
         uint16_t length,
         uint8_t format,
         uxrStreamId stream_id,
@@ -16,7 +16,7 @@ extern void read_submessage_format(
 
 static void read_format_data(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
@@ -24,7 +24,7 @@ static void read_format_data(
 
 static void read_format_sample(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
@@ -32,7 +32,7 @@ static void read_format_sample(
 
 static void read_format_data_seq(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
@@ -40,7 +40,7 @@ static void read_format_data_seq(
 
 static void read_format_sample_seq(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
@@ -48,7 +48,7 @@ static void read_format_sample_seq(
 
 static void read_format_packed_samples(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
@@ -86,11 +86,11 @@ uint16_t uxr_buffer_request_data(
     payload_length += 4; // stream, format, and two optionals.
     payload_length += (control != NULL) ? 8 : 0; // delivery control
 
-    ucdrBuffer ub;
-    if(uxr_prepare_stream_to_write_submessage(session, stream_id, payload_length, &ub, SUBMESSAGE_ID_READ_DATA, 0))
+    ucdrStream us;
+    if(uxr_prepare_stream_to_write_submessage(session, stream_id, payload_length, &us, SUBMESSAGE_ID_READ_DATA, 0))
     {
         request_id = uxr_init_base_object_request(&session->info, datareader_id, &payload.base);
-        (void) uxr_serialize_READ_DATA_Payload(&ub, &payload);
+        (void) uxr_serialize_READ_DATA_Payload(&us, &payload);
     }
 
     return request_id;
@@ -111,7 +111,7 @@ uint16_t uxr_buffer_cancel_data(
 //==================================================================
 void read_submessage_format(
         uxrSession* session,
-        ucdrBuffer* data,
+        ucdrStream* data,
         uint16_t length,
         uint8_t format,
         uxrStreamId stream_id,
@@ -147,21 +147,22 @@ void read_submessage_format(
 
 inline void read_format_data(
         uxrSession* session,
-        ucdrBuffer* ub,
+        ucdrStream* us,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
         uint16_t request_id)
 {
     (void) length;
-    ub->last_data_size = 8; //reset alignment (as if we were created a new ucdrBuffer)
+// TODO (julian): refactor to ucdrStream.
+//    us->last_data_size = 8; //reset alignment (as if we were created a new ucdrStream)
 
-    session->on_topic(session, object_id, request_id, stream_id, ub, session->on_topic_args);
+    session->on_topic(session, object_id, request_id, stream_id, us, session->on_topic_args);
 }
 
 void read_format_sample(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
@@ -173,7 +174,7 @@ void read_format_sample(
 
 void read_format_data_seq(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
@@ -185,7 +186,7 @@ void read_format_data_seq(
 
 void read_format_sample_seq(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,
@@ -197,7 +198,7 @@ void read_format_sample_seq(
 
 void read_format_packed_samples(
         uxrSession* session,
-        ucdrBuffer* payload,
+        ucdrStream* payload,
         uint16_t length,
         uxrStreamId stream_id,
         uxrObjectId object_id,

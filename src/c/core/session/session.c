@@ -35,25 +35,25 @@ static bool recv_message(const uxrSession* session, uint8_t** buffer, size_t* le
 static void write_submessage_heartbeat(const uxrSession* session, uxrStreamId stream);
 static void write_submessage_acknack(const uxrSession* session, uxrStreamId stream);
 
-static void read_message(uxrSession* session, ucdrBuffer* message);
-static void read_stream(uxrSession* session, ucdrBuffer* message, uxrStreamId id, uxrSeqNum seq_num);
-static void read_submessage_list(uxrSession* session, ucdrBuffer* submessages, uxrStreamId stream_id);
-static void read_submessage(uxrSession* session, ucdrBuffer* submessage,
+static void read_message(uxrSession* session, ucdrStream* message);
+static void read_stream(uxrSession* session, ucdrStream* message, uxrStreamId id, uxrSeqNum seq_num);
+static void read_submessage_list(uxrSession* session, ucdrStream* submessages, uxrStreamId stream_id);
+static void read_submessage(uxrSession* session, ucdrStream* submessage,
                             uint8_t submessage_id, uxrStreamId stream_id, uint16_t length, uint8_t flags);
 
-static void read_submessage_status(uxrSession* session, ucdrBuffer* submessage);
-static void read_submessage_data(uxrSession* session, ucdrBuffer* submessage, uint16_t length, uxrStreamId stream_id, uint8_t format);
-static void read_submessage_heartbeat(uxrSession* session, ucdrBuffer* submessage);
-static void read_submessage_acknack(uxrSession* session, ucdrBuffer* submessage);
-static void read_submessage_timestamp_reply(uxrSession* session, ucdrBuffer* submessage);
+static void read_submessage_status(uxrSession* session, ucdrStream* submessage);
+static void read_submessage_data(uxrSession* session, ucdrStream* submessage, uint16_t length, uxrStreamId stream_id, uint8_t format);
+static void read_submessage_heartbeat(uxrSession* session, ucdrStream* submessage);
+static void read_submessage_acknack(uxrSession* session, ucdrStream* submessage);
+static void read_submessage_timestamp_reply(uxrSession* session, ucdrStream* submessage);
 #ifdef PERFORMANCE_TESTING
-static void read_submessage_performance(uxrSession* session, ucdrBuffer* submessage, uint16_t length);
+static void read_submessage_performance(uxrSession* session, ucdrStream* submessage, uint16_t length);
 #endif
 
 static void process_status(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uint8_t status);
 static void process_timestamp_reply(uxrSession* session, TIMESTAMP_REPLY_Payload* timestamp);
 
-static void on_new_output_reliable_stream_segment(ucdrBuffer* ub, uxrOutputReliableStream* args);
+static void on_new_output_reliable_stream_segment(ucdrStream* us, uxrOutputReliableStream* args);
 static FragmentationInfo on_get_fragmentation_info(uint8_t* submessage_header);
 
 static bool run_session_until_sync(uxrSession* session, int timeout);
@@ -115,13 +115,14 @@ bool uxr_create_session(uxrSession* session)
     uxr_reset_stream_storage(&session->streams);
 
     uint8_t create_session_buffer[CREATE_SESSION_MAX_MSG_SIZE];
-    ucdrBuffer ub;
-    ucdr_init_buffer_offset(&ub, create_session_buffer, CREATE_SESSION_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
+    ucdrStream us;
+    ucdr_init_buffer_offset(&us, create_session_buffer, CREATE_SESSION_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
 
-    uxr_buffer_create_session(&session->info, &ub, (uint16_t)(session->comm->mtu - INTERNAL_RELIABLE_BUFFER_OFFSET));
-    uxr_stamp_create_session_header(&session->info, ub.init);
+    uxr_buffer_create_session(&session->info, &us, (uint16_t)(session->comm->mtu - INTERNAL_RELIABLE_BUFFER_OFFSET));
+// TODO (julian): refactor to ucdrStream.
+//    uxr_stamp_create_session_header(&session->info, us.init);
 
-    bool received = wait_session_status(session, create_session_buffer, ucdr_buffer_length(&ub), UXR_CONFIG_MAX_SESSION_CONNECTION_ATTEMPTS);
+    bool received = wait_session_status(session, create_session_buffer, ucdr_buffer_length(&us), UXR_CONFIG_MAX_SESSION_CONNECTION_ATTEMPTS);
     bool created = received && UXR_STATUS_OK == session->info.last_requested_status;
     return created;
 }
@@ -129,13 +130,14 @@ bool uxr_create_session(uxrSession* session)
 bool uxr_delete_session(uxrSession* session)
 {
     uint8_t delete_session_buffer[DELETE_SESSION_MAX_MSG_SIZE];
-    ucdrBuffer ub;
-    ucdr_init_buffer_offset(&ub, delete_session_buffer, DELETE_SESSION_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
+    ucdrStream us;
+    ucdr_init_buffer_offset(&us, delete_session_buffer, DELETE_SESSION_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
 
-    uxr_buffer_delete_session(&session->info, &ub);
-    uxr_stamp_session_header(&session->info, 0, 0, ub.init);
+    uxr_buffer_delete_session(&session->info, &us);
+// TODO (julian): refactor to ucdrStream.
+//    uxr_stamp_session_header(&session->info, 0, 0, us.init);
 
-    bool received = wait_session_status(session, delete_session_buffer, ucdr_buffer_length(&ub), UXR_CONFIG_MAX_SESSION_CONNECTION_ATTEMPTS);
+    bool received = wait_session_status(session, delete_session_buffer, ucdr_buffer_length(&us), UXR_CONFIG_MAX_SESSION_CONNECTION_ATTEMPTS);
     return received && UXR_STATUS_OK == session->info.last_requested_status;
 }
 
@@ -264,18 +266,19 @@ bool uxr_run_session_until_one_status(uxrSession* session, int timeout_ms, const
 bool uxr_sync_session(uxrSession* session, int time)
 {
     uint8_t timestamp_buffer[TIMESTAMP_MAX_MSG_SIZE];
-    ucdrBuffer ub;
-    ucdr_init_buffer_offset(&ub, timestamp_buffer, sizeof(timestamp_buffer), uxr_session_header_offset(&session->info));
-    uxr_buffer_submessage_header(&ub, SUBMESSAGE_ID_TIMESTAMP, TIMESTAMP_PAYLOAD_SIZE, 0);
+    ucdrStream us;
+    ucdr_init_buffer_offset(&us, timestamp_buffer, sizeof(timestamp_buffer), uxr_session_header_offset(&session->info));
+    uxr_buffer_submessage_header(&us, SUBMESSAGE_ID_TIMESTAMP, TIMESTAMP_PAYLOAD_SIZE, 0);
 
     TIMESTAMP_Payload timestamp;
     int64_t nanos = uxr_nanos();
     timestamp.transmit_timestamp.seconds = (int32_t)(nanos / 1000000000);
     timestamp.transmit_timestamp.nanoseconds = (uint32_t)(nanos % 1000000000);
-    (void) uxr_serialize_TIMESTAMP_Payload(&ub, &timestamp);
+    (void) uxr_serialize_TIMESTAMP_Payload(&us, &timestamp);
 
-    uxr_stamp_session_header(&session->info, 0, 0, ub.init);
-    send_message(session, timestamp_buffer, ucdr_buffer_length(&ub));
+// TODO (julian): refactor to ucdrStream.
+//    uxr_stamp_session_header(&session->info, 0, 0, us.init);
+    send_message(session, timestamp_buffer, ucdr_buffer_length(&us));
     return run_session_until_sync(session, time);
 }
 
@@ -303,7 +306,7 @@ bool uxr_buffer_performance(uxrSession *session,
     payload.epoch_time_msb = (uint32_t)(epoch_time >> 32);
     payload.buf = buf;
     payload.len = len;
-    ucdrBuffer mb;
+    ucdrStream mb;
     const uint16_t payload_length = (uint16_t)(sizeof(payload.epoch_time_lsb) +
                                                sizeof(payload.epoch_time_msb) +
                                                len);
@@ -356,9 +359,9 @@ bool listen_message(uxrSession* session, int poll_ms)
     bool must_be_read = recv_message(session, &data, &length, poll_ms);
     if(must_be_read)
     {
-        ucdrBuffer ub;
-        ucdr_init_buffer(&ub, data, (uint32_t)length);
-        read_message(session, &ub);
+        ucdrStream us;
+        ucdr_init_buffer(&us, data, (uint32_t)length);
+        read_message(session, &us);
     }
 
     return must_be_read;
@@ -440,36 +443,37 @@ inline bool recv_message(const uxrSession* session, uint8_t**buffer, size_t* len
 void write_submessage_heartbeat(const uxrSession* session, uxrStreamId id)
 {
     uint8_t heartbeat_buffer[HEARTBEAT_MAX_MSG_SIZE];
-    ucdrBuffer ub;
-    ucdr_init_buffer_offset(&ub, heartbeat_buffer, HEARTBEAT_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
+    ucdrStream us;
+    ucdr_init_buffer_offset(&us, heartbeat_buffer, HEARTBEAT_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
 
     const uxrOutputReliableStream* stream = &session->streams.output_reliable[id.index];
 
     /* Buffer submessage header. */
-    uxr_buffer_submessage_header(&ub, SUBMESSAGE_ID_HEARTBEAT, HEARTBEAT_PAYLOAD_SIZE, 0);
+    uxr_buffer_submessage_header(&us, SUBMESSAGE_ID_HEARTBEAT, HEARTBEAT_PAYLOAD_SIZE, 0);
 
     /* Buffer HEARTBEAT. */
     HEARTBEAT_Payload payload;
     payload.first_unacked_seq_nr = uxr_seq_num_add(stream->last_acknown, 1);
     payload.last_unacked_seq_nr = stream->last_sent;
     payload.stream_id = id.raw;
-    (void) uxr_serialize_HEARTBEAT_Payload(&ub, &payload);
+    (void) uxr_serialize_HEARTBEAT_Payload(&us, &payload);
 
     /* Stamp message header. */
-    uxr_stamp_session_header(&session->info, 0, 0, ub.init);
-    send_message(session, heartbeat_buffer, ucdr_buffer_length(&ub));
+// TODO (julian): refactor to ucdrStream.
+//    uxr_stamp_session_header(&session->info, 0, 0, us.init);
+    send_message(session, heartbeat_buffer, ucdr_buffer_length(&us));
 }
 
 void write_submessage_acknack(const uxrSession* session, uxrStreamId id)
 {
     uint8_t acknack_buffer[ACKNACK_MAX_MSG_SIZE];
-    ucdrBuffer ub;
-    ucdr_init_buffer_offset(&ub, acknack_buffer, ACKNACK_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
+    ucdrStream us;
+    ucdr_init_buffer_offset(&us, acknack_buffer, ACKNACK_MAX_MSG_SIZE, uxr_session_header_offset(&session->info));
 
     const uxrInputReliableStream* stream = &session->streams.input_reliable[id.index];
 
     /* Buffer submessage header. */
-    uxr_buffer_submessage_header(&ub, SUBMESSAGE_ID_ACKNACK, ACKNACK_PAYLOAD_SIZE, 0);
+    uxr_buffer_submessage_header(&us, SUBMESSAGE_ID_ACKNACK, ACKNACK_PAYLOAD_SIZE, 0);
 
     /* Buffer ACKNACK. */
     ACKNACK_Payload payload;
@@ -477,31 +481,32 @@ void write_submessage_acknack(const uxrSession* session, uxrStreamId id)
     payload.nack_bitmap[0] = (uint8_t)(nack_bitmap >> 8);
     payload.nack_bitmap[1] = (uint8_t)((nack_bitmap << 8) >> 8);
     payload.stream_id = id.raw;
-    (void) uxr_serialize_ACKNACK_Payload(&ub, &payload);
+    (void) uxr_serialize_ACKNACK_Payload(&us, &payload);
 
     /* Stamp message header. */
-    uxr_stamp_session_header(&session->info, 0, 0, ub.init);
-    send_message(session, acknack_buffer, ucdr_buffer_length(&ub));
+// TODO (julian): refactor to ucdrStream.
+//    uxr_stamp_session_header(&session->info, 0, 0, us.init);
+    send_message(session, acknack_buffer, ucdr_buffer_length(&us));
 }
 
-void read_message(uxrSession* session, ucdrBuffer* ub)
+void read_message(uxrSession* session, ucdrStream* us)
 {
     uint8_t stream_id_raw; uxrSeqNum seq_num;
-    if(uxr_read_session_header(&session->info, ub, &stream_id_raw, &seq_num))
+    if(uxr_read_session_header(&session->info, us, &stream_id_raw, &seq_num))
     {
         uxrStreamId id = uxr_stream_id_from_raw(stream_id_raw, UXR_INPUT_STREAM);
-        read_stream(session, ub, id, seq_num);
+        read_stream(session, us, id, seq_num);
     }
 }
 
-void read_stream(uxrSession* session, ucdrBuffer* ub, uxrStreamId stream_id, uxrSeqNum seq_num)
+void read_stream(uxrSession* session, ucdrStream* us, uxrStreamId stream_id, uxrSeqNum seq_num)
 {
     switch(stream_id.type)
     {
         case UXR_NONE_STREAM:
         {
             stream_id = uxr_stream_id_from_raw(0x00, UXR_INPUT_STREAM);
-            read_submessage_list(session, ub, stream_id);
+            read_submessage_list(session, us, stream_id);
             break;
         }
         case UXR_BEST_EFFORT_STREAM:
@@ -509,7 +514,7 @@ void read_stream(uxrSession* session, ucdrBuffer* ub, uxrStreamId stream_id, uxr
             uxrInputBestEffortStream* stream = uxr_get_input_best_effort_stream(&session->streams, stream_id.index);
             if(stream && uxr_receive_best_effort_message(stream, seq_num))
             {
-                read_submessage_list(session, ub, stream_id);
+                read_submessage_list(session, us, stream_id);
             }
             break;
         }
@@ -517,14 +522,14 @@ void read_stream(uxrSession* session, ucdrBuffer* ub, uxrStreamId stream_id, uxr
         {
             uxrInputReliableStream* stream = uxr_get_input_reliable_stream(&session->streams, stream_id.index);
             bool input_buffer_used;
-            if(stream && uxr_receive_reliable_message(stream, seq_num, ub->iterator, ucdr_buffer_remaining(ub), &input_buffer_used))
+            if(stream && uxr_receive_reliable_message(stream, seq_num, us->iterator, ucdr_buffer_remaining(us), &input_buffer_used))
             {
                 if(!input_buffer_used)
                 {
-                    read_submessage_list(session, ub, stream_id);
+                    read_submessage_list(session, us, stream_id);
                 }
 
-                ucdrBuffer next_mb;
+                ucdrStream next_mb;
                 while(uxr_next_input_reliable_buffer_available(stream, &next_mb, SUBHEADER_SIZE))
                 {
                     read_submessage_list(session, &next_mb, stream_id);
@@ -538,7 +543,7 @@ void read_stream(uxrSession* session, ucdrBuffer* ub, uxrStreamId stream_id, uxr
     }
 }
 
-void read_submessage_list(uxrSession* session, ucdrBuffer* submessages, uxrStreamId stream_id)
+void read_submessage_list(uxrSession* session, ucdrStream* submessages, uxrStreamId stream_id)
 {
     uint8_t id; uint16_t length; uint8_t flags;
     while(uxr_read_submessage_header(submessages, &id, &length, &flags))
@@ -547,7 +552,7 @@ void read_submessage_list(uxrSession* session, ucdrBuffer* submessages, uxrStrea
     }
 }
 
-void read_submessage(uxrSession* session, ucdrBuffer* submessage, uint8_t submessage_id, uxrStreamId stream_id, uint16_t length, uint8_t flags)
+void read_submessage(uxrSession* session, ucdrStream* submessage, uint8_t submessage_id, uxrStreamId stream_id, uint16_t length, uint8_t flags)
 {
     switch(submessage_id)
     {
@@ -596,7 +601,7 @@ void read_submessage(uxrSession* session, ucdrBuffer* submessage, uint8_t submes
     }
 }
 
-void read_submessage_status(uxrSession* session, ucdrBuffer* submessage)
+void read_submessage_status(uxrSession* session, ucdrStream* submessage)
 {
     STATUS_Payload payload;
     uxr_deserialize_STATUS_Payload(submessage, &payload);
@@ -609,10 +614,10 @@ void read_submessage_status(uxrSession* session, ucdrBuffer* submessage)
 }
 
 
-extern void read_submessage_format(uxrSession* session, ucdrBuffer* data, uint16_t length, uint8_t format,
+extern void read_submessage_format(uxrSession* session, ucdrStream* data, uint16_t length, uint8_t format,
                                    uxrStreamId stream_id, uxrObjectId object_id, uint16_t request_id);
 
-void read_submessage_data(uxrSession* session, ucdrBuffer* submessage, uint16_t length, uxrStreamId stream_id, uint8_t format)
+void read_submessage_data(uxrSession* session, ucdrStream* submessage, uint16_t length, uxrStreamId stream_id, uint8_t format)
 {
     BaseObjectRequest base;
     uxr_deserialize_BaseObjectRequest(submessage, &base);
@@ -629,7 +634,7 @@ void read_submessage_data(uxrSession* session, ucdrBuffer* submessage, uint16_t 
     }
 }
 
-void read_submessage_heartbeat(uxrSession* session, ucdrBuffer* submessage)
+void read_submessage_heartbeat(uxrSession* session, ucdrStream* submessage)
 {
     HEARTBEAT_Payload heartbeat;
     uxr_deserialize_HEARTBEAT_Payload(submessage, &heartbeat);
@@ -643,7 +648,7 @@ void read_submessage_heartbeat(uxrSession* session, ucdrBuffer* submessage)
     }
 }
 
-void read_submessage_acknack(uxrSession* session, ucdrBuffer* submessage)
+void read_submessage_acknack(uxrSession* session, ucdrStream* submessage)
 {
     ACKNACK_Payload acknack;
     uxr_deserialize_ACKNACK_Payload(submessage, &acknack);
@@ -664,7 +669,7 @@ void read_submessage_acknack(uxrSession* session, ucdrBuffer* submessage)
     }
 }
 
-void read_submessage_timestamp_reply(uxrSession* session, ucdrBuffer* submessage)
+void read_submessage_timestamp_reply(uxrSession* session, ucdrStream* submessage)
 {
     TIMESTAMP_REPLY_Payload timestamp_reply;
     uxr_deserialize_TIMESTAMP_REPLY_Payload(submessage, &timestamp_reply);
@@ -673,9 +678,9 @@ void read_submessage_timestamp_reply(uxrSession* session, ucdrBuffer* submessage
 }
 
 #ifdef PERFORMANCE_TESTING
-void read_submessage_performance(uxrSession* session, ucdrBuffer* submessage, uint16_t length)
+void read_submessage_performance(uxrSession* session, ucdrStream* submessage, uint16_t length)
 {
-    ucdrBuffer mb_performance;
+    ucdrStream mb_performance;
     ucdr_init_buffer(&mb_performance, submessage->iterator, length);
     session->on_performance(session, &mb_performance, session->on_performance_args);
 }
@@ -723,7 +728,7 @@ void process_timestamp_reply(uxrSession* session, TIMESTAMP_REPLY_Payload* times
     session->synchronized = true;
 }
 
-bool uxr_prepare_stream_to_write_submessage(uxrSession* session, uxrStreamId stream_id, size_t payload_size, ucdrBuffer* ub, uint8_t submessage_id, uint8_t mode)
+bool uxr_prepare_stream_to_write_submessage(uxrSession* session, uxrStreamId stream_id, size_t payload_size, ucdrStream* us, uint8_t submessage_id, uint8_t mode)
 {
     bool available = false;
     size_t submessage_size = SUBHEADER_SIZE + payload_size + uxr_submessage_padding(payload_size);
@@ -733,13 +738,13 @@ bool uxr_prepare_stream_to_write_submessage(uxrSession* session, uxrStreamId str
         case UXR_BEST_EFFORT_STREAM:
         {
             uxrOutputBestEffortStream* stream = uxr_get_output_best_effort_stream(&session->streams, stream_id.index);
-            available = stream && uxr_prepare_best_effort_buffer_to_write(stream, submessage_size, ub);
+            available = stream && uxr_prepare_best_effort_buffer_to_write(stream, submessage_size, us);
             break;
         }
         case UXR_RELIABLE_STREAM:
         {
             uxrOutputReliableStream* stream = uxr_get_output_reliable_stream(&session->streams, stream_id.index);
-            available = stream && uxr_prepare_reliable_buffer_to_write(stream, submessage_size, SUBHEADER_SIZE, ub);
+            available = stream && uxr_prepare_reliable_buffer_to_write(stream, submessage_size, SUBHEADER_SIZE, us);
             break;
         }
         default:
@@ -748,27 +753,28 @@ bool uxr_prepare_stream_to_write_submessage(uxrSession* session, uxrStreamId str
 
     if(available)
     {
-        (void) uxr_buffer_submessage_header(ub, submessage_id, (uint16_t)payload_size, mode);
+        (void) uxr_buffer_submessage_header(us, submessage_id, (uint16_t)payload_size, mode);
     }
 
     return available;
 }
 
-void on_new_output_reliable_stream_segment(ucdrBuffer* ub, uxrOutputReliableStream* stream)
+void on_new_output_reliable_stream_segment(ucdrStream* us, uxrOutputReliableStream* stream)
 {
     uint8_t* last_buffer = uxr_get_output_buffer(stream, stream->last_written % stream->history);
-    uint8_t last_fragment_flag = FLAG_LAST_FRAGMENT * (last_buffer == ub->init);
-
-    (void) uxr_buffer_submessage_header(ub, SUBMESSAGE_ID_FRAGMENT, (uint16_t)(ucdr_buffer_remaining(ub) - SUBHEADER_SIZE), last_fragment_flag);
+// TODO (julian): refactor to ucdrStream.
+//    uint8_t last_fragment_flag = FLAG_LAST_FRAGMENT * (last_buffer == us->init);
+//
+//    (void) uxr_buffer_submessage_header(us, SUBMESSAGE_ID_FRAGMENT, (uint16_t)(ucdr_buffer_remaining(us) - SUBHEADER_SIZE), last_fragment_flag);
 }
 
 FragmentationInfo on_get_fragmentation_info(uint8_t* submessage_header)
 {
-    ucdrBuffer ub;
-    ucdr_init_buffer(&ub, submessage_header, SUBHEADER_SIZE);
+    ucdrStream us;
+    ucdr_init_buffer(&us, submessage_header, SUBHEADER_SIZE);
 
     uint8_t id; uint16_t length; uint8_t flags;
-    uxr_read_submessage_header(&ub, &id, &length, &flags);
+    uxr_read_submessage_header(&us, &id, &length, &flags);
 
     FragmentationInfo fragmentation_info;
     if(SUBMESSAGE_ID_FRAGMENT == id)

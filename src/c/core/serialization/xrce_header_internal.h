@@ -1,4 +1,4 @@
-// Copyright 2017 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,8 +29,19 @@ extern "C"
 #define SESSION_ID_WITH_CLIENT_KEY 0x00
 #define SESSION_ID_WITHOUT_CLIENT_KEY 0x80
 
-void uxr_serialize_message_header(ucdrBuffer* ub, uint8_t session_id, uint8_t stream_id, uint16_t seq_num, const uint8_t* key);
-void uxr_deserialize_message_header(ucdrBuffer* ub, uint8_t* session_id, uint8_t* stream_id, uint16_t* seq_num, uint8_t* key);
+void uxr_serialize_message_header(
+        ucdrStream* us,
+        uint8_t session_id,
+        uint8_t stream_id,
+        uint16_t seq_num,
+        const uint8_t* key);
+
+void uxr_deserialize_message_header(
+        ucdrStream* us,
+        uint8_t* session_id,
+        uint8_t* stream_id,
+        uint16_t* seq_num,
+        uint8_t* key);
 
 #ifdef __cplusplus
 }

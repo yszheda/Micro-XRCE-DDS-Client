@@ -1007,291 +1007,291 @@ typedef struct PERFORMANCE_Payload
 } PERFORMANCE_Payload;
 #endif
 
-bool uxr_serialize_Time_t(ucdrBuffer* buffer, const Time_t* input);
-bool uxr_deserialize_Time_t(ucdrBuffer* buffer, Time_t* output);
+bool uxr_serialize_Time_t(ucdrStream* buffer, const Time_t* input);
+bool uxr_deserialize_Time_t(ucdrStream* buffer, Time_t* output);
 
-bool uxr_serialize_BinarySequence_t(ucdrBuffer* buffer, const BinarySequence_t* input);
-bool uxr_deserialize_BinarySequence_t(ucdrBuffer* buffer, BinarySequence_t* output);
+bool uxr_serialize_BinarySequence_t(ucdrStream* buffer, const BinarySequence_t* input);
+bool uxr_deserialize_BinarySequence_t(ucdrStream* buffer, BinarySequence_t* output);
 
-bool uxr_serialize_StringSequence_t(ucdrBuffer* buffer, const StringSequence_t* input);
-bool uxr_deserialize_StringSequence_t(ucdrBuffer* buffer, StringSequence_t* output);
+bool uxr_serialize_StringSequence_t(ucdrStream* buffer, const StringSequence_t* input);
+bool uxr_deserialize_StringSequence_t(ucdrStream* buffer, StringSequence_t* output);
 
-bool uxr_serialize_ClientKey(ucdrBuffer* buffer, const ClientKey* input);
-bool uxr_deserialize_ClientKey(ucdrBuffer* buffer, ClientKey* output);
+bool uxr_serialize_ClientKey(ucdrStream* buffer, const ClientKey* input);
+bool uxr_deserialize_ClientKey(ucdrStream* buffer, ClientKey* output);
 
-bool uxr_serialize_ObjectId(ucdrBuffer* buffer, const ObjectId* input);
-bool uxr_deserialize_ObjectId(ucdrBuffer* buffer, ObjectId* output);
+bool uxr_serialize_ObjectId(ucdrStream* buffer, const ObjectId* input);
+bool uxr_deserialize_ObjectId(ucdrStream* buffer, ObjectId* output);
 
-bool uxr_serialize_ObjectPrefix(ucdrBuffer* buffer, const ObjectPrefix* input);
-bool uxr_deserialize_ObjectPrefix(ucdrBuffer* buffer, ObjectPrefix* output);
+bool uxr_serialize_ObjectPrefix(ucdrStream* buffer, const ObjectPrefix* input);
+bool uxr_deserialize_ObjectPrefix(ucdrStream* buffer, ObjectPrefix* output);
 
-bool uxr_serialize_XrceCookie(ucdrBuffer* buffer, const XrceCookie* input);
-bool uxr_deserialize_XrceCookie(ucdrBuffer* buffer, XrceCookie* output);
+bool uxr_serialize_XrceCookie(ucdrStream* buffer, const XrceCookie* input);
+bool uxr_deserialize_XrceCookie(ucdrStream* buffer, XrceCookie* output);
 
-bool uxr_serialize_XrceVersion(ucdrBuffer* buffer, const XrceVersion* input);
-bool uxr_deserialize_XrceVersion(ucdrBuffer* buffer, XrceVersion* output);
+bool uxr_serialize_XrceVersion(ucdrStream* buffer, const XrceVersion* input);
+bool uxr_deserialize_XrceVersion(ucdrStream* buffer, XrceVersion* output);
 
-bool uxr_serialize_XrceVendorId(ucdrBuffer* buffer, const XrceVendorId* input);
-bool uxr_deserialize_XrceVendorId(ucdrBuffer* buffer, XrceVendorId* output);
+bool uxr_serialize_XrceVendorId(ucdrStream* buffer, const XrceVendorId* input);
+bool uxr_deserialize_XrceVendorId(ucdrStream* buffer, XrceVendorId* output);
 
-bool uxr_serialize_TransportLocatorSmall(ucdrBuffer* buffer, const TransportLocatorSmall* input);
-bool uxr_deserialize_TransportLocatorSmall(ucdrBuffer* buffer, TransportLocatorSmall* output);
+bool uxr_serialize_TransportLocatorSmall(ucdrStream* buffer, const TransportLocatorSmall* input);
+bool uxr_deserialize_TransportLocatorSmall(ucdrStream* buffer, TransportLocatorSmall* output);
 
-bool uxr_serialize_TransportLocatorMedium(ucdrBuffer* buffer, const TransportLocatorMedium* input);
-bool uxr_deserialize_TransportLocatorMedium(ucdrBuffer* buffer, TransportLocatorMedium* output);
+bool uxr_serialize_TransportLocatorMedium(ucdrStream* buffer, const TransportLocatorMedium* input);
+bool uxr_deserialize_TransportLocatorMedium(ucdrStream* buffer, TransportLocatorMedium* output);
 
-bool uxr_serialize_TransportLocatorLarge(ucdrBuffer* buffer, const TransportLocatorLarge* input);
-bool uxr_deserialize_TransportLocatorLarge(ucdrBuffer* buffer, TransportLocatorLarge* output);
+bool uxr_serialize_TransportLocatorLarge(ucdrStream* buffer, const TransportLocatorLarge* input);
+bool uxr_deserialize_TransportLocatorLarge(ucdrStream* buffer, TransportLocatorLarge* output);
 
-bool uxr_serialize_TransportLocatorString(ucdrBuffer* buffer, const TransportLocatorString* input);
-bool uxr_deserialize_TransportLocatorString(ucdrBuffer* buffer, TransportLocatorString* output);
+bool uxr_serialize_TransportLocatorString(ucdrStream* buffer, const TransportLocatorString* input);
+bool uxr_deserialize_TransportLocatorString(ucdrStream* buffer, TransportLocatorString* output);
 
-bool uxr_serialize_TransportLocator(ucdrBuffer* buffer, const TransportLocator* input);
-bool uxr_deserialize_TransportLocator(ucdrBuffer* buffer, TransportLocator* output);
+bool uxr_serialize_TransportLocator(ucdrStream* buffer, const TransportLocator* input);
+bool uxr_deserialize_TransportLocator(ucdrStream* buffer, TransportLocator* output);
 
-bool uxr_serialize_TransportLocatorSeq(ucdrBuffer* buffer, const TransportLocatorSeq* input);
-bool uxr_deserialize_TransportLocatorSeq(ucdrBuffer* buffer, TransportLocatorSeq* output);
+bool uxr_serialize_TransportLocatorSeq(ucdrStream* buffer, const TransportLocatorSeq* input);
+bool uxr_deserialize_TransportLocatorSeq(ucdrStream* buffer, TransportLocatorSeq* output);
 
-bool uxr_serialize_Property(ucdrBuffer* buffer, const Property* input);
-bool uxr_deserialize_Property(ucdrBuffer* buffer, Property* output);
+bool uxr_serialize_Property(ucdrStream* buffer, const Property* input);
+bool uxr_deserialize_Property(ucdrStream* buffer, Property* output);
 
-bool uxr_serialize_PropertySeq(ucdrBuffer* buffer, const PropertySeq* input);
-bool uxr_deserialize_PropertySeq(ucdrBuffer* buffer, PropertySeq* output);
+bool uxr_serialize_PropertySeq(ucdrStream* buffer, const PropertySeq* input);
+bool uxr_deserialize_PropertySeq(ucdrStream* buffer, PropertySeq* output);
 
-bool uxr_serialize_CLIENT_Representation(ucdrBuffer* buffer, const CLIENT_Representation* input);
-bool uxr_deserialize_CLIENT_Representation(ucdrBuffer* buffer, CLIENT_Representation* output);
+bool uxr_serialize_CLIENT_Representation(ucdrStream* buffer, const CLIENT_Representation* input);
+bool uxr_deserialize_CLIENT_Representation(ucdrStream* buffer, CLIENT_Representation* output);
 
-bool uxr_serialize_AGENT_Representation(ucdrBuffer* buffer, const AGENT_Representation* input);
-bool uxr_deserialize_AGENT_Representation(ucdrBuffer* buffer, AGENT_Representation* output);
+bool uxr_serialize_AGENT_Representation(ucdrStream* buffer, const AGENT_Representation* input);
+bool uxr_deserialize_AGENT_Representation(ucdrStream* buffer, AGENT_Representation* output);
 
-bool uxr_serialize_OBJK_Representation3Formats(ucdrBuffer* buffer, const OBJK_Representation3Formats* input);
-bool uxr_deserialize_OBJK_Representation3Formats(ucdrBuffer* buffer, OBJK_Representation3Formats* output);
+bool uxr_serialize_OBJK_Representation3Formats(ucdrStream* buffer, const OBJK_Representation3Formats* input);
+bool uxr_deserialize_OBJK_Representation3Formats(ucdrStream* buffer, OBJK_Representation3Formats* output);
 
-bool uxr_serialize_OBJK_RepresentationRefAndXMLFormats(ucdrBuffer* buffer, const OBJK_RepresentationRefAndXMLFormats* input);
-bool uxr_deserialize_OBJK_RepresentationRefAndXMLFormats(ucdrBuffer* buffer, OBJK_RepresentationRefAndXMLFormats* output);
+bool uxr_serialize_OBJK_RepresentationRefAndXMLFormats(ucdrStream* buffer, const OBJK_RepresentationRefAndXMLFormats* input);
+bool uxr_deserialize_OBJK_RepresentationRefAndXMLFormats(ucdrStream* buffer, OBJK_RepresentationRefAndXMLFormats* output);
 
-bool uxr_serialize_OBJK_RepresentationBinAndXMLFormats(ucdrBuffer* buffer, const OBJK_RepresentationBinAndXMLFormats* input);
-bool uxr_deserialize_OBJK_RepresentationBinAndXMLFormats(ucdrBuffer* buffer, OBJK_RepresentationBinAndXMLFormats* output);
+bool uxr_serialize_OBJK_RepresentationBinAndXMLFormats(ucdrStream* buffer, const OBJK_RepresentationBinAndXMLFormats* input);
+bool uxr_deserialize_OBJK_RepresentationBinAndXMLFormats(ucdrStream* buffer, OBJK_RepresentationBinAndXMLFormats* output);
 
-bool uxr_serialize_OBJK_RepresentationRefAndXML_Base(ucdrBuffer* buffer, const OBJK_RepresentationRefAndXML_Base* input);
-bool uxr_deserialize_OBJK_RepresentationRefAndXML_Base(ucdrBuffer* buffer, OBJK_RepresentationRefAndXML_Base* output);
+bool uxr_serialize_OBJK_RepresentationRefAndXML_Base(ucdrStream* buffer, const OBJK_RepresentationRefAndXML_Base* input);
+bool uxr_deserialize_OBJK_RepresentationRefAndXML_Base(ucdrStream* buffer, OBJK_RepresentationRefAndXML_Base* output);
 
-bool uxr_serialize_OBJK_RepresentationBinAndXML_Base(ucdrBuffer* buffer, const OBJK_RepresentationBinAndXML_Base* input);
-bool uxr_deserialize_OBJK_RepresentationBinAndXML_Base(ucdrBuffer* buffer, OBJK_RepresentationBinAndXML_Base* output);
+bool uxr_serialize_OBJK_RepresentationBinAndXML_Base(ucdrStream* buffer, const OBJK_RepresentationBinAndXML_Base* input);
+bool uxr_deserialize_OBJK_RepresentationBinAndXML_Base(ucdrStream* buffer, OBJK_RepresentationBinAndXML_Base* output);
 
-bool uxr_serialize_OBJK_Representation3_Base(ucdrBuffer* buffer, const OBJK_Representation3_Base* input);
-bool uxr_deserialize_OBJK_Representation3_Base(ucdrBuffer* buffer, OBJK_Representation3_Base* output);
+bool uxr_serialize_OBJK_Representation3_Base(ucdrStream* buffer, const OBJK_Representation3_Base* input);
+bool uxr_deserialize_OBJK_Representation3_Base(ucdrStream* buffer, OBJK_Representation3_Base* output);
 
-bool uxr_serialize_OBJK_QOSPROFILE_Representation(ucdrBuffer* buffer, const OBJK_QOSPROFILE_Representation* input);
-bool uxr_deserialize_OBJK_QOSPROFILE_Representation(ucdrBuffer* buffer, OBJK_QOSPROFILE_Representation* output);
+bool uxr_serialize_OBJK_QOSPROFILE_Representation(ucdrStream* buffer, const OBJK_QOSPROFILE_Representation* input);
+bool uxr_deserialize_OBJK_QOSPROFILE_Representation(ucdrStream* buffer, OBJK_QOSPROFILE_Representation* output);
 
-bool uxr_serialize_OBJK_TYPE_Representation(ucdrBuffer* buffer, const OBJK_TYPE_Representation* input);
-bool uxr_deserialize_OBJK_TYPE_Representation(ucdrBuffer* buffer, OBJK_TYPE_Representation* output);
+bool uxr_serialize_OBJK_TYPE_Representation(ucdrStream* buffer, const OBJK_TYPE_Representation* input);
+bool uxr_deserialize_OBJK_TYPE_Representation(ucdrStream* buffer, OBJK_TYPE_Representation* output);
 
-bool uxr_serialize_OBJK_DOMAIN_Representation(ucdrBuffer* buffer, const OBJK_DOMAIN_Representation* input);
-bool uxr_deserialize_OBJK_DOMAIN_Representation(ucdrBuffer* buffer, OBJK_DOMAIN_Representation* output);
+bool uxr_serialize_OBJK_DOMAIN_Representation(ucdrStream* buffer, const OBJK_DOMAIN_Representation* input);
+bool uxr_deserialize_OBJK_DOMAIN_Representation(ucdrStream* buffer, OBJK_DOMAIN_Representation* output);
 
-bool uxr_serialize_OBJK_APPLICATION_Representation(ucdrBuffer* buffer, const OBJK_APPLICATION_Representation* input);
-bool uxr_deserialize_OBJK_APPLICATION_Representation(ucdrBuffer* buffer, OBJK_APPLICATION_Representation* output);
+bool uxr_serialize_OBJK_APPLICATION_Representation(ucdrStream* buffer, const OBJK_APPLICATION_Representation* input);
+bool uxr_deserialize_OBJK_APPLICATION_Representation(ucdrStream* buffer, OBJK_APPLICATION_Representation* output);
 
-bool uxr_serialize_OBJK_PUBLISHER_Representation(ucdrBuffer* buffer, const OBJK_PUBLISHER_Representation* input);
-bool uxr_deserialize_OBJK_PUBLISHER_Representation(ucdrBuffer* buffer, OBJK_PUBLISHER_Representation* output);
+bool uxr_serialize_OBJK_PUBLISHER_Representation(ucdrStream* buffer, const OBJK_PUBLISHER_Representation* input);
+bool uxr_deserialize_OBJK_PUBLISHER_Representation(ucdrStream* buffer, OBJK_PUBLISHER_Representation* output);
 
-bool uxr_serialize_OBJK_SUBSCRIBER_Representation(ucdrBuffer* buffer, const OBJK_SUBSCRIBER_Representation* input);
-bool uxr_deserialize_OBJK_SUBSCRIBER_Representation(ucdrBuffer* buffer, OBJK_SUBSCRIBER_Representation* output);
+bool uxr_serialize_OBJK_SUBSCRIBER_Representation(ucdrStream* buffer, const OBJK_SUBSCRIBER_Representation* input);
+bool uxr_deserialize_OBJK_SUBSCRIBER_Representation(ucdrStream* buffer, OBJK_SUBSCRIBER_Representation* output);
 
-bool uxr_serialize_DATAWRITER_Representation(ucdrBuffer* buffer, const DATAWRITER_Representation* input);
-bool uxr_deserialize_DATAWRITER_Representation(ucdrBuffer* buffer, DATAWRITER_Representation* output);
+bool uxr_serialize_DATAWRITER_Representation(ucdrStream* buffer, const DATAWRITER_Representation* input);
+bool uxr_deserialize_DATAWRITER_Representation(ucdrStream* buffer, DATAWRITER_Representation* output);
 
-bool uxr_serialize_DATAREADER_Representation(ucdrBuffer* buffer, const DATAREADER_Representation* input);
-bool uxr_deserialize_DATAREADER_Representation(ucdrBuffer* buffer, DATAREADER_Representation* output);
+bool uxr_serialize_DATAREADER_Representation(ucdrStream* buffer, const DATAREADER_Representation* input);
+bool uxr_deserialize_DATAREADER_Representation(ucdrStream* buffer, DATAREADER_Representation* output);
 
-bool uxr_serialize_OBJK_PARTICIPANT_Representation(ucdrBuffer* buffer, const OBJK_PARTICIPANT_Representation* input);
-bool uxr_deserialize_OBJK_PARTICIPANT_Representation(ucdrBuffer* buffer, OBJK_PARTICIPANT_Representation* output);
+bool uxr_serialize_OBJK_PARTICIPANT_Representation(ucdrStream* buffer, const OBJK_PARTICIPANT_Representation* input);
+bool uxr_deserialize_OBJK_PARTICIPANT_Representation(ucdrStream* buffer, OBJK_PARTICIPANT_Representation* output);
 
-bool uxr_serialize_OBJK_TOPIC_Representation(ucdrBuffer* buffer, const OBJK_TOPIC_Representation* input);
-bool uxr_deserialize_OBJK_TOPIC_Representation(ucdrBuffer* buffer, OBJK_TOPIC_Representation* output);
+bool uxr_serialize_OBJK_TOPIC_Representation(ucdrStream* buffer, const OBJK_TOPIC_Representation* input);
+bool uxr_deserialize_OBJK_TOPIC_Representation(ucdrStream* buffer, OBJK_TOPIC_Representation* output);
 
-bool uxr_serialize_OBJK_DomainParticipant_Binary(ucdrBuffer* buffer, const OBJK_DomainParticipant_Binary* input);
-bool uxr_deserialize_OBJK_DomainParticipant_Binary(ucdrBuffer* buffer, OBJK_DomainParticipant_Binary* output);
+bool uxr_serialize_OBJK_DomainParticipant_Binary(ucdrStream* buffer, const OBJK_DomainParticipant_Binary* input);
+bool uxr_deserialize_OBJK_DomainParticipant_Binary(ucdrStream* buffer, OBJK_DomainParticipant_Binary* output);
 
-bool uxr_serialize_OBJK_Topic_Binary(ucdrBuffer* buffer, const OBJK_Topic_Binary* input);
-bool uxr_deserialize_OBJK_Topic_Binary(ucdrBuffer* buffer, OBJK_Topic_Binary* output);
+bool uxr_serialize_OBJK_Topic_Binary(ucdrStream* buffer, const OBJK_Topic_Binary* input);
+bool uxr_deserialize_OBJK_Topic_Binary(ucdrStream* buffer, OBJK_Topic_Binary* output);
 
-bool uxr_serialize_OBJK_Publisher_Binary_Qos(ucdrBuffer* buffer, const OBJK_Publisher_Binary_Qos* input);
-bool uxr_deserialize_OBJK_Publisher_Binary_Qos(ucdrBuffer* buffer, OBJK_Publisher_Binary_Qos* output);
+bool uxr_serialize_OBJK_Publisher_Binary_Qos(ucdrStream* buffer, const OBJK_Publisher_Binary_Qos* input);
+bool uxr_deserialize_OBJK_Publisher_Binary_Qos(ucdrStream* buffer, OBJK_Publisher_Binary_Qos* output);
 
-bool uxr_serialize_OBJK_Publisher_Binary(ucdrBuffer* buffer, const OBJK_Publisher_Binary* input);
-bool uxr_deserialize_OBJK_Publisher_Binary(ucdrBuffer* buffer, OBJK_Publisher_Binary* output);
+bool uxr_serialize_OBJK_Publisher_Binary(ucdrStream* buffer, const OBJK_Publisher_Binary* input);
+bool uxr_deserialize_OBJK_Publisher_Binary(ucdrStream* buffer, OBJK_Publisher_Binary* output);
 
-bool uxr_serialize_OBJK_Subscriber_Binary_Qos(ucdrBuffer* buffer, const OBJK_Subscriber_Binary_Qos* input);
-bool uxr_deserialize_OBJK_Subscriber_Binary_Qos(ucdrBuffer* buffer, OBJK_Subscriber_Binary_Qos* output);
+bool uxr_serialize_OBJK_Subscriber_Binary_Qos(ucdrStream* buffer, const OBJK_Subscriber_Binary_Qos* input);
+bool uxr_deserialize_OBJK_Subscriber_Binary_Qos(ucdrStream* buffer, OBJK_Subscriber_Binary_Qos* output);
 
-bool uxr_serialize_OBJK_Subscriber_Binary(ucdrBuffer* buffer, const OBJK_Subscriber_Binary* input);
-bool uxr_deserialize_OBJK_Subscriber_Binary(ucdrBuffer* buffer, OBJK_Subscriber_Binary* output);
+bool uxr_serialize_OBJK_Subscriber_Binary(ucdrStream* buffer, const OBJK_Subscriber_Binary* input);
+bool uxr_deserialize_OBJK_Subscriber_Binary(ucdrStream* buffer, OBJK_Subscriber_Binary* output);
 
-bool uxr_serialize_OBJK_Endpoint_QosBinary(ucdrBuffer* buffer, const OBJK_Endpoint_QosBinary* input);
-bool uxr_deserialize_OBJK_Endpoint_QosBinary(ucdrBuffer* buffer, OBJK_Endpoint_QosBinary* output);
+bool uxr_serialize_OBJK_Endpoint_QosBinary(ucdrStream* buffer, const OBJK_Endpoint_QosBinary* input);
+bool uxr_deserialize_OBJK_Endpoint_QosBinary(ucdrStream* buffer, OBJK_Endpoint_QosBinary* output);
 
-bool uxr_serialize_OBJK_DataWriter_Binary_Qos(ucdrBuffer* buffer, const OBJK_DataWriter_Binary_Qos* input);
-bool uxr_deserialize_OBJK_DataWriter_Binary_Qos(ucdrBuffer* buffer, OBJK_DataWriter_Binary_Qos* output);
+bool uxr_serialize_OBJK_DataWriter_Binary_Qos(ucdrStream* buffer, const OBJK_DataWriter_Binary_Qos* input);
+bool uxr_deserialize_OBJK_DataWriter_Binary_Qos(ucdrStream* buffer, OBJK_DataWriter_Binary_Qos* output);
 
-bool uxr_serialize_OBJK_DataReader_Binary_Qos(ucdrBuffer* buffer, const OBJK_DataReader_Binary_Qos* input);
-bool uxr_deserialize_OBJK_DataReader_Binary_Qos(ucdrBuffer* buffer, OBJK_DataReader_Binary_Qos* output);
+bool uxr_serialize_OBJK_DataReader_Binary_Qos(ucdrStream* buffer, const OBJK_DataReader_Binary_Qos* input);
+bool uxr_deserialize_OBJK_DataReader_Binary_Qos(ucdrStream* buffer, OBJK_DataReader_Binary_Qos* output);
 
-bool uxr_serialize_OBJK_DataReader_Binary(ucdrBuffer* buffer, const OBJK_DataReader_Binary* input);
-bool uxr_deserialize_OBJK_DataReader_Binary(ucdrBuffer* buffer, OBJK_DataReader_Binary* output);
+bool uxr_serialize_OBJK_DataReader_Binary(ucdrStream* buffer, const OBJK_DataReader_Binary* input);
+bool uxr_deserialize_OBJK_DataReader_Binary(ucdrStream* buffer, OBJK_DataReader_Binary* output);
 
-bool uxr_serialize_OBJK_DataWriter_Binary(ucdrBuffer* buffer, const OBJK_DataWriter_Binary* input);
-bool uxr_deserialize_OBJK_DataWriter_Binary(ucdrBuffer* buffer, OBJK_DataWriter_Binary* output);
+bool uxr_serialize_OBJK_DataWriter_Binary(ucdrStream* buffer, const OBJK_DataWriter_Binary* input);
+bool uxr_deserialize_OBJK_DataWriter_Binary(ucdrStream* buffer, OBJK_DataWriter_Binary* output);
 
-bool uxr_serialize_ObjectVariant(ucdrBuffer* buffer, const ObjectVariant* input);
-bool uxr_deserialize_ObjectVariant(ucdrBuffer* buffer, ObjectVariant* output);
+bool uxr_serialize_ObjectVariant(ucdrStream* buffer, const ObjectVariant* input);
+bool uxr_deserialize_ObjectVariant(ucdrStream* buffer, ObjectVariant* output);
 
-bool uxr_serialize_CreationMode(ucdrBuffer* buffer, const CreationMode* input);
-bool uxr_deserialize_CreationMode(ucdrBuffer* buffer, CreationMode* output);
+bool uxr_serialize_CreationMode(ucdrStream* buffer, const CreationMode* input);
+bool uxr_deserialize_CreationMode(ucdrStream* buffer, CreationMode* output);
 
-bool uxr_serialize_RequestId(ucdrBuffer* buffer, const RequestId* input);
-bool uxr_deserialize_RequestId(ucdrBuffer* buffer, RequestId* output);
+bool uxr_serialize_RequestId(ucdrStream* buffer, const RequestId* input);
+bool uxr_deserialize_RequestId(ucdrStream* buffer, RequestId* output);
 
-bool uxr_serialize_ResultStatus(ucdrBuffer* buffer, const ResultStatus* input);
-bool uxr_deserialize_ResultStatus(ucdrBuffer* buffer, ResultStatus* output);
+bool uxr_serialize_ResultStatus(ucdrStream* buffer, const ResultStatus* input);
+bool uxr_deserialize_ResultStatus(ucdrStream* buffer, ResultStatus* output);
 
-bool uxr_serialize_BaseObjectRequest(ucdrBuffer* buffer, const BaseObjectRequest* input);
-bool uxr_deserialize_BaseObjectRequest(ucdrBuffer* buffer, BaseObjectRequest* output);
+bool uxr_serialize_BaseObjectRequest(ucdrStream* buffer, const BaseObjectRequest* input);
+bool uxr_deserialize_BaseObjectRequest(ucdrStream* buffer, BaseObjectRequest* output);
 
-bool uxr_serialize_AGENT_ActivityInfo(ucdrBuffer* buffer, const AGENT_ActivityInfo* input);
-bool uxr_deserialize_AGENT_ActivityInfo(ucdrBuffer* buffer, AGENT_ActivityInfo* output);
+bool uxr_serialize_AGENT_ActivityInfo(ucdrStream* buffer, const AGENT_ActivityInfo* input);
+bool uxr_deserialize_AGENT_ActivityInfo(ucdrStream* buffer, AGENT_ActivityInfo* output);
 
-bool uxr_serialize_DATAREADER_ActivityInfo(ucdrBuffer* buffer, const DATAREADER_ActivityInfo* input);
-bool uxr_deserialize_DATAREADER_ActivityInfo(ucdrBuffer* buffer, DATAREADER_ActivityInfo* output);
+bool uxr_serialize_DATAREADER_ActivityInfo(ucdrStream* buffer, const DATAREADER_ActivityInfo* input);
+bool uxr_deserialize_DATAREADER_ActivityInfo(ucdrStream* buffer, DATAREADER_ActivityInfo* output);
 
-bool uxr_serialize_DATAWRITER_ActivityInfo(ucdrBuffer* buffer, const DATAWRITER_ActivityInfo* input);
-bool uxr_deserialize_DATAWRITER_ActivityInfo(ucdrBuffer* buffer, DATAWRITER_ActivityInfo* output);
+bool uxr_serialize_DATAWRITER_ActivityInfo(ucdrStream* buffer, const DATAWRITER_ActivityInfo* input);
+bool uxr_deserialize_DATAWRITER_ActivityInfo(ucdrStream* buffer, DATAWRITER_ActivityInfo* output);
 
-bool uxr_serialize_ActivityInfoVariant(ucdrBuffer* buffer, const ActivityInfoVariant* input);
-bool uxr_deserialize_ActivityInfoVariant(ucdrBuffer* buffer, ActivityInfoVariant* output);
+bool uxr_serialize_ActivityInfoVariant(ucdrStream* buffer, const ActivityInfoVariant* input);
+bool uxr_deserialize_ActivityInfoVariant(ucdrStream* buffer, ActivityInfoVariant* output);
 
-bool uxr_serialize_ObjectInfo(ucdrBuffer* buffer, const ObjectInfo* input);
-bool uxr_deserialize_ObjectInfo(ucdrBuffer* buffer, ObjectInfo* output);
+bool uxr_serialize_ObjectInfo(ucdrStream* buffer, const ObjectInfo* input);
+bool uxr_deserialize_ObjectInfo(ucdrStream* buffer, ObjectInfo* output);
 
-bool uxr_serialize_BaseObjectReply(ucdrBuffer* buffer, const BaseObjectReply* input);
-bool uxr_deserialize_BaseObjectReply(ucdrBuffer* buffer, BaseObjectReply* output);
+bool uxr_serialize_BaseObjectReply(ucdrStream* buffer, const BaseObjectReply* input);
+bool uxr_deserialize_BaseObjectReply(ucdrStream* buffer, BaseObjectReply* output);
 
-bool uxr_serialize_DataDeliveryControl(ucdrBuffer* buffer, const DataDeliveryControl* input);
-bool uxr_deserialize_DataDeliveryControl(ucdrBuffer* buffer, DataDeliveryControl* output);
+bool uxr_serialize_DataDeliveryControl(ucdrStream* buffer, const DataDeliveryControl* input);
+bool uxr_deserialize_DataDeliveryControl(ucdrStream* buffer, DataDeliveryControl* output);
 
-bool uxr_serialize_ReadSpecification(ucdrBuffer* buffer, const ReadSpecification* input);
-bool uxr_deserialize_ReadSpecification(ucdrBuffer* buffer, ReadSpecification* output);
+bool uxr_serialize_ReadSpecification(ucdrStream* buffer, const ReadSpecification* input);
+bool uxr_deserialize_ReadSpecification(ucdrStream* buffer, ReadSpecification* output);
 
-bool uxr_serialize_SeqNumberAndTimestamp(ucdrBuffer* buffer, const SeqNumberAndTimestamp* input);
-bool uxr_deserialize_SeqNumberAndTimestamp(ucdrBuffer* buffer, SeqNumberAndTimestamp* output);
+bool uxr_serialize_SeqNumberAndTimestamp(ucdrStream* buffer, const SeqNumberAndTimestamp* input);
+bool uxr_deserialize_SeqNumberAndTimestamp(ucdrStream* buffer, SeqNumberAndTimestamp* output);
 
-bool uxr_serialize_SampleInfoDetail(ucdrBuffer* buffer, const SampleInfoDetail* input);
-bool uxr_deserialize_SampleInfoDetail(ucdrBuffer* buffer, SampleInfoDetail* output);
+bool uxr_serialize_SampleInfoDetail(ucdrStream* buffer, const SampleInfoDetail* input);
+bool uxr_deserialize_SampleInfoDetail(ucdrStream* buffer, SampleInfoDetail* output);
 
-bool uxr_serialize_SampleInfo(ucdrBuffer* buffer, const SampleInfo* input);
-bool uxr_deserialize_SampleInfo(ucdrBuffer* buffer, SampleInfo* output);
+bool uxr_serialize_SampleInfo(ucdrStream* buffer, const SampleInfo* input);
+bool uxr_deserialize_SampleInfo(ucdrStream* buffer, SampleInfo* output);
 
-bool uxr_serialize_SampleInfoDelta(ucdrBuffer* buffer, const SampleInfoDelta* input);
-bool uxr_deserialize_SampleInfoDelta(ucdrBuffer* buffer, SampleInfoDelta* output);
+bool uxr_serialize_SampleInfoDelta(ucdrStream* buffer, const SampleInfoDelta* input);
+bool uxr_deserialize_SampleInfoDelta(ucdrStream* buffer, SampleInfoDelta* output);
 
-bool uxr_serialize_SampleData(ucdrBuffer* buffer, const SampleData* input);
-bool uxr_deserialize_SampleData(ucdrBuffer* buffer, SampleData* output);
+bool uxr_serialize_SampleData(ucdrStream* buffer, const SampleData* input);
+bool uxr_deserialize_SampleData(ucdrStream* buffer, SampleData* output);
 
-bool uxr_serialize_SampleDataSeq(ucdrBuffer* buffer, const SampleDataSeq* input);
-bool uxr_deserialize_SampleDataSeq(ucdrBuffer* buffer, SampleDataSeq* output);
+bool uxr_serialize_SampleDataSeq(ucdrStream* buffer, const SampleDataSeq* input);
+bool uxr_deserialize_SampleDataSeq(ucdrStream* buffer, SampleDataSeq* output);
 
-bool uxr_serialize_Sample(ucdrBuffer* buffer, const Sample* input);
-bool uxr_deserialize_Sample(ucdrBuffer* buffer, Sample* output);
+bool uxr_serialize_Sample(ucdrStream* buffer, const Sample* input);
+bool uxr_deserialize_Sample(ucdrStream* buffer, Sample* output);
 
-bool uxr_serialize_SampleSeq(ucdrBuffer* buffer, const SampleSeq* input);
-bool uxr_deserialize_SampleSeq(ucdrBuffer* buffer, SampleSeq* output);
+bool uxr_serialize_SampleSeq(ucdrStream* buffer, const SampleSeq* input);
+bool uxr_deserialize_SampleSeq(ucdrStream* buffer, SampleSeq* output);
 
-bool uxr_serialize_SampleDelta(ucdrBuffer* buffer, const SampleDelta* input);
-bool uxr_deserialize_SampleDelta(ucdrBuffer* buffer, SampleDelta* output);
+bool uxr_serialize_SampleDelta(ucdrStream* buffer, const SampleDelta* input);
+bool uxr_deserialize_SampleDelta(ucdrStream* buffer, SampleDelta* output);
 
-bool uxr_serialize_SampleDeltaSequence(ucdrBuffer* buffer, const SampleDeltaSequence* input);
-bool uxr_deserialize_SampleDeltaSequence(ucdrBuffer* buffer, SampleDeltaSequence* output);
+bool uxr_serialize_SampleDeltaSequence(ucdrStream* buffer, const SampleDeltaSequence* input);
+bool uxr_deserialize_SampleDeltaSequence(ucdrStream* buffer, SampleDeltaSequence* output);
 
-bool uxr_serialize_PackedSamples(ucdrBuffer* buffer, const PackedSamples* input);
-bool uxr_deserialize_PackedSamples(ucdrBuffer* buffer, PackedSamples* output);
+bool uxr_serialize_PackedSamples(ucdrStream* buffer, const PackedSamples* input);
+bool uxr_deserialize_PackedSamples(ucdrStream* buffer, PackedSamples* output);
 
-bool uxr_serialize_SamplePackedSeq(ucdrBuffer* buffer, const SamplePackedSeq* input);
-bool uxr_deserialize_SamplePackedSeq(ucdrBuffer* buffer, SamplePackedSeq* output);
+bool uxr_serialize_SamplePackedSeq(ucdrStream* buffer, const SamplePackedSeq* input);
+bool uxr_deserialize_SamplePackedSeq(ucdrStream* buffer, SamplePackedSeq* output);
 
-bool uxr_serialize_DataRepresentation(ucdrBuffer* buffer, const DataRepresentation* input);
-bool uxr_deserialize_DataRepresentation(ucdrBuffer* buffer, DataRepresentation* output);
+bool uxr_serialize_DataRepresentation(ucdrStream* buffer, const DataRepresentation* input);
+bool uxr_deserialize_DataRepresentation(ucdrStream* buffer, DataRepresentation* output);
 
-bool uxr_serialize_CREATE_CLIENT_Payload(ucdrBuffer* buffer, const CREATE_CLIENT_Payload* input);
-bool uxr_deserialize_CREATE_CLIENT_Payload(ucdrBuffer* buffer, CREATE_CLIENT_Payload* output);
+bool uxr_serialize_CREATE_CLIENT_Payload(ucdrStream* buffer, const CREATE_CLIENT_Payload* input);
+bool uxr_deserialize_CREATE_CLIENT_Payload(ucdrStream* buffer, CREATE_CLIENT_Payload* output);
 
-bool uxr_serialize_CREATE_Payload(ucdrBuffer* buffer, const CREATE_Payload* input);
-bool uxr_deserialize_CREATE_Payload(ucdrBuffer* buffer, CREATE_Payload* output);
+bool uxr_serialize_CREATE_Payload(ucdrStream* buffer, const CREATE_Payload* input);
+bool uxr_deserialize_CREATE_Payload(ucdrStream* buffer, CREATE_Payload* output);
 
-bool uxr_serialize_GET_INFO_Payload(ucdrBuffer* buffer, const GET_INFO_Payload* input);
-bool uxr_deserialize_GET_INFO_Payload(ucdrBuffer* buffer, GET_INFO_Payload* output);
+bool uxr_serialize_GET_INFO_Payload(ucdrStream* buffer, const GET_INFO_Payload* input);
+bool uxr_deserialize_GET_INFO_Payload(ucdrStream* buffer, GET_INFO_Payload* output);
 
-bool uxr_serialize_DELETE_Payload(ucdrBuffer* buffer, const DELETE_Payload* input);
-bool uxr_deserialize_DELETE_Payload(ucdrBuffer* buffer, DELETE_Payload* output);
+bool uxr_serialize_DELETE_Payload(ucdrStream* buffer, const DELETE_Payload* input);
+bool uxr_deserialize_DELETE_Payload(ucdrStream* buffer, DELETE_Payload* output);
 
-bool uxr_serialize_STATUS_AGENT_Payload(ucdrBuffer* buffer, const STATUS_AGENT_Payload* input);
-bool uxr_deserialize_STATUS_AGENT_Payload(ucdrBuffer* buffer, STATUS_AGENT_Payload* output);
+bool uxr_serialize_STATUS_AGENT_Payload(ucdrStream* buffer, const STATUS_AGENT_Payload* input);
+bool uxr_deserialize_STATUS_AGENT_Payload(ucdrStream* buffer, STATUS_AGENT_Payload* output);
 
-bool uxr_serialize_STATUS_Payload(ucdrBuffer* buffer, const STATUS_Payload* input);
-bool uxr_deserialize_STATUS_Payload(ucdrBuffer* buffer, STATUS_Payload* output);
+bool uxr_serialize_STATUS_Payload(ucdrStream* buffer, const STATUS_Payload* input);
+bool uxr_deserialize_STATUS_Payload(ucdrStream* buffer, STATUS_Payload* output);
 
-bool uxr_serialize_INFO_Payload(ucdrBuffer* buffer, const INFO_Payload* input);
-bool uxr_deserialize_INFO_Payload(ucdrBuffer* buffer, INFO_Payload* output);
+bool uxr_serialize_INFO_Payload(ucdrStream* buffer, const INFO_Payload* input);
+bool uxr_deserialize_INFO_Payload(ucdrStream* buffer, INFO_Payload* output);
 
-bool uxr_serialize_READ_DATA_Payload(ucdrBuffer* buffer, const READ_DATA_Payload* input);
-bool uxr_deserialize_READ_DATA_Payload(ucdrBuffer* buffer, READ_DATA_Payload* output);
+bool uxr_serialize_READ_DATA_Payload(ucdrStream* buffer, const READ_DATA_Payload* input);
+bool uxr_deserialize_READ_DATA_Payload(ucdrStream* buffer, READ_DATA_Payload* output);
 
-bool uxr_serialize_WRITE_DATA_Payload_Data(ucdrBuffer* buffer, const WRITE_DATA_Payload_Data* input);
-bool uxr_deserialize_WRITE_DATA_Payload_Data(ucdrBuffer* buffer, WRITE_DATA_Payload_Data* output);
+bool uxr_serialize_WRITE_DATA_Payload_Data(ucdrStream* buffer, const WRITE_DATA_Payload_Data* input);
+bool uxr_deserialize_WRITE_DATA_Payload_Data(ucdrStream* buffer, WRITE_DATA_Payload_Data* output);
 
-bool uxr_serialize_WRITE_DATA_Payload_Sample(ucdrBuffer* buffer, const WRITE_DATA_Payload_Sample* input);
-bool uxr_deserialize_WRITE_DATA_Payload_Sample(ucdrBuffer* buffer, WRITE_DATA_Payload_Sample* output);
+bool uxr_serialize_WRITE_DATA_Payload_Sample(ucdrStream* buffer, const WRITE_DATA_Payload_Sample* input);
+bool uxr_deserialize_WRITE_DATA_Payload_Sample(ucdrStream* buffer, WRITE_DATA_Payload_Sample* output);
 
-bool uxr_serialize_WRITE_DATA_Payload_DataSeq(ucdrBuffer* buffer, const WRITE_DATA_Payload_DataSeq* input);
-bool uxr_deserialize_WRITE_DATA_Payload_DataSeq(ucdrBuffer* buffer, WRITE_DATA_Payload_DataSeq* output);
+bool uxr_serialize_WRITE_DATA_Payload_DataSeq(ucdrStream* buffer, const WRITE_DATA_Payload_DataSeq* input);
+bool uxr_deserialize_WRITE_DATA_Payload_DataSeq(ucdrStream* buffer, WRITE_DATA_Payload_DataSeq* output);
 
-bool uxr_serialize_WRITE_DATA_Payload_SampleSeq(ucdrBuffer* buffer, const WRITE_DATA_Payload_SampleSeq* input);
-bool uxr_deserialize_WRITE_DATA_Payload_SampleSeq(ucdrBuffer* buffer, WRITE_DATA_Payload_SampleSeq* output);
+bool uxr_serialize_WRITE_DATA_Payload_SampleSeq(ucdrStream* buffer, const WRITE_DATA_Payload_SampleSeq* input);
+bool uxr_deserialize_WRITE_DATA_Payload_SampleSeq(ucdrStream* buffer, WRITE_DATA_Payload_SampleSeq* output);
 
-bool uxr_serialize_WRITE_DATA_Payload_PackedSamples(ucdrBuffer* buffer, const WRITE_DATA_Payload_PackedSamples* input);
-bool uxr_deserialize_WRITE_DATA_Payload_PackedSamples(ucdrBuffer* buffer, WRITE_DATA_Payload_PackedSamples* output);
+bool uxr_serialize_WRITE_DATA_Payload_PackedSamples(ucdrStream* buffer, const WRITE_DATA_Payload_PackedSamples* input);
+bool uxr_deserialize_WRITE_DATA_Payload_PackedSamples(ucdrStream* buffer, WRITE_DATA_Payload_PackedSamples* output);
 
-bool uxr_serialize_DATA_Payload_Data(ucdrBuffer* buffer, const DATA_Payload_Data* input);
-bool uxr_deserialize_DATA_Payload_Data(ucdrBuffer* buffer, DATA_Payload_Data* output);
+bool uxr_serialize_DATA_Payload_Data(ucdrStream* buffer, const DATA_Payload_Data* input);
+bool uxr_deserialize_DATA_Payload_Data(ucdrStream* buffer, DATA_Payload_Data* output);
 
-bool uxr_serialize_DATA_Payload_Sample(ucdrBuffer* buffer, const DATA_Payload_Sample* input);
-bool uxr_deserialize_DATA_Payload_Sample(ucdrBuffer* buffer, DATA_Payload_Sample* output);
+bool uxr_serialize_DATA_Payload_Sample(ucdrStream* buffer, const DATA_Payload_Sample* input);
+bool uxr_deserialize_DATA_Payload_Sample(ucdrStream* buffer, DATA_Payload_Sample* output);
 
-bool uxr_serialize_DATA_Payload_DataSeq(ucdrBuffer* buffer, const DATA_Payload_DataSeq* input);
-bool uxr_deserialize_DATA_Payload_DataSeq(ucdrBuffer* buffer, DATA_Payload_DataSeq* output);
+bool uxr_serialize_DATA_Payload_DataSeq(ucdrStream* buffer, const DATA_Payload_DataSeq* input);
+bool uxr_deserialize_DATA_Payload_DataSeq(ucdrStream* buffer, DATA_Payload_DataSeq* output);
 
-bool uxr_serialize_DATA_Payload_SampleSeq(ucdrBuffer* buffer, const DATA_Payload_SampleSeq* input);
-bool uxr_deserialize_DATA_Payload_SampleSeq(ucdrBuffer* buffer, DATA_Payload_SampleSeq* output);
+bool uxr_serialize_DATA_Payload_SampleSeq(ucdrStream* buffer, const DATA_Payload_SampleSeq* input);
+bool uxr_deserialize_DATA_Payload_SampleSeq(ucdrStream* buffer, DATA_Payload_SampleSeq* output);
 
-bool uxr_serialize_DATA_Payload_PackedSamples(ucdrBuffer* buffer, const DATA_Payload_PackedSamples* input);
-bool uxr_deserialize_DATA_Payload_PackedSamples(ucdrBuffer* buffer, DATA_Payload_PackedSamples* output);
+bool uxr_serialize_DATA_Payload_PackedSamples(ucdrStream* buffer, const DATA_Payload_PackedSamples* input);
+bool uxr_deserialize_DATA_Payload_PackedSamples(ucdrStream* buffer, DATA_Payload_PackedSamples* output);
 
-bool uxr_serialize_ACKNACK_Payload(ucdrBuffer* buffer, const ACKNACK_Payload* input);
-bool uxr_deserialize_ACKNACK_Payload(ucdrBuffer* buffer, ACKNACK_Payload* output);
+bool uxr_serialize_ACKNACK_Payload(ucdrStream* buffer, const ACKNACK_Payload* input);
+bool uxr_deserialize_ACKNACK_Payload(ucdrStream* buffer, ACKNACK_Payload* output);
 
-bool uxr_serialize_HEARTBEAT_Payload(ucdrBuffer* buffer, const HEARTBEAT_Payload* input);
-bool uxr_deserialize_HEARTBEAT_Payload(ucdrBuffer* buffer, HEARTBEAT_Payload* output);
+bool uxr_serialize_HEARTBEAT_Payload(ucdrStream* buffer, const HEARTBEAT_Payload* input);
+bool uxr_deserialize_HEARTBEAT_Payload(ucdrStream* buffer, HEARTBEAT_Payload* output);
 
-bool uxr_serialize_TIMESTAMP_Payload(ucdrBuffer* buffer, const TIMESTAMP_Payload* input);
-bool uxr_deserialize_TIMESTAMP_Payload(ucdrBuffer* buffer, TIMESTAMP_Payload* output);
+bool uxr_serialize_TIMESTAMP_Payload(ucdrStream* buffer, const TIMESTAMP_Payload* input);
+bool uxr_deserialize_TIMESTAMP_Payload(ucdrStream* buffer, TIMESTAMP_Payload* output);
 
-bool uxr_serialize_TIMESTAMP_REPLY_Payload(ucdrBuffer* buffer, const TIMESTAMP_REPLY_Payload* input);
-bool uxr_deserialize_TIMESTAMP_REPLY_Payload(ucdrBuffer* buffer, TIMESTAMP_REPLY_Payload* output);
+bool uxr_serialize_TIMESTAMP_REPLY_Payload(ucdrStream* buffer, const TIMESTAMP_REPLY_Payload* input);
+bool uxr_deserialize_TIMESTAMP_REPLY_Payload(ucdrStream* buffer, TIMESTAMP_REPLY_Payload* output);
 
 #ifdef PERFORMANCE_TESTING
-bool uxr_serialize_PERFORMANCE_Payload(ucdrBuffer* buffer, const PERFORMANCE_Payload* input);
-bool uxr_deserialize_PERFORMANCE_Payload(ucdrBuffer* buffer, PERFORMANCE_Payload* input);
+bool uxr_serialize_PERFORMANCE_Payload(ucdrStream* buffer, const PERFORMANCE_Payload* input);
+bool uxr_deserialize_PERFORMANCE_Payload(ucdrStream* buffer, PERFORMANCE_Payload* input);
 #endif
 
 #ifdef __cplusplus

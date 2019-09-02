@@ -31,7 +31,10 @@ void uxr_init_session_info(uxrSessionInfo* info, uint8_t id, uint32_t key)
     info->last_requested_status = UXR_STATUS_NONE;
 }
 
-void uxr_buffer_create_session(uxrSessionInfo* info, ucdrBuffer* ub, uint16_t mtu)
+void uxr_buffer_create_session(
+        uxrSessionInfo* info,
+        ucdrStream* us,
+        uint16_t mtu)
 {
     CREATE_CLIENT_Payload payload;
     payload.client_representation.xrce_cookie = XRCE_COOKIE;
@@ -47,11 +50,13 @@ void uxr_buffer_create_session(uxrSessionInfo* info, ucdrBuffer* ub, uint16_t mt
 
     info->last_request_id = UXR_REQUEST_LOGIN;
 
-    (void) uxr_buffer_submessage_header(ub, SUBMESSAGE_ID_CREATE_CLIENT, CREATE_CLIENT_PAYLOAD_SIZE, 0);
-    (void) uxr_serialize_CREATE_CLIENT_Payload(ub, &payload);
+    (void) uxr_buffer_submessage_header(us, SUBMESSAGE_ID_CREATE_CLIENT, CREATE_CLIENT_PAYLOAD_SIZE, 0);
+    (void) uxr_serialize_CREATE_CLIENT_Payload(us, &payload);
 }
 
-void uxr_buffer_delete_session(uxrSessionInfo* info, ucdrBuffer* ub)
+void uxr_buffer_delete_session(
+        uxrSessionInfo* info,
+        ucdrStream* us)
 {
     DELETE_Payload payload;
     payload.base.request_id = COMPOUND_LITERAL(RequestId){{0x00, UXR_REQUEST_LOGOUT}};
@@ -59,21 +64,22 @@ void uxr_buffer_delete_session(uxrSessionInfo* info, ucdrBuffer* ub)
 
     info->last_request_id = UXR_REQUEST_LOGOUT;
 
-    (void) uxr_buffer_submessage_header(ub, SUBMESSAGE_ID_DELETE, DELETE_CLIENT_PAYLOAD_SIZE, 0);
-    (void) uxr_serialize_DELETE_Payload(ub, &payload);
+    (void) uxr_buffer_submessage_header(us, SUBMESSAGE_ID_DELETE, DELETE_CLIENT_PAYLOAD_SIZE, 0);
+    (void) uxr_serialize_DELETE_Payload(us, &payload);
 }
 
-void uxr_read_create_session_status(uxrSessionInfo* info, ucdrBuffer* ub)
+void uxr_read_create_session_status(
+        uxrSessionInfo* info, ucdrStream* us)
 {
     STATUS_AGENT_Payload payload;
-    (void) uxr_deserialize_STATUS_AGENT_Payload(ub, &payload);
+    (void) uxr_deserialize_STATUS_AGENT_Payload(us, &payload);
     info->last_requested_status = payload.result.status;
 }
 
-void uxr_read_delete_session_status(uxrSessionInfo* info, ucdrBuffer* ub)
+void uxr_read_delete_session_status(uxrSessionInfo* info, ucdrStream* us)
 {
     STATUS_Payload payload;
-    (void) uxr_deserialize_STATUS_Payload(ub, &payload);
+    (void) uxr_deserialize_STATUS_Payload(us, &payload);
 
     if(UXR_REQUEST_LOGOUT == info->last_request_id)
     {
@@ -85,27 +91,35 @@ void uxr_read_delete_session_status(uxrSessionInfo* info, ucdrBuffer* ub)
 
 void uxr_stamp_create_session_header(const uxrSessionInfo* info, uint8_t* buffer)
 {
-    ucdrBuffer ub;
-    ucdr_init_buffer(&ub, buffer, MAX_HEADER_SIZE);
+    ucdrStream us;
+    ucdr_init_buffer(&us, buffer, MAX_HEADER_SIZE);
 
-    uxr_serialize_message_header(&ub, info->id & SESSION_ID_WITHOUT_CLIENT_KEY, 0, 0, info->key);
+    uxr_serialize_message_header(&us, info->id & SESSION_ID_WITHOUT_CLIENT_KEY, 0, 0, info->key);
 }
 
-void uxr_stamp_session_header(const uxrSessionInfo* info, uint8_t stream_id_raw, uxrSeqNum seq_num, uint8_t* buffer)
+void uxr_stamp_session_header(
+        const uxrSessionInfo* info,
+        uint8_t stream_id_raw,
+        uxrSeqNum seq_num,
+        uint8_t* buffer)
 {
-    ucdrBuffer ub;
-    ucdr_init_buffer(&ub, buffer, MAX_HEADER_SIZE);
+    ucdrStream us;
+    ucdr_init_buffer(&us, buffer, MAX_HEADER_SIZE);
 
-    uxr_serialize_message_header(&ub, info->id, stream_id_raw, seq_num, info->key);
+    uxr_serialize_message_header(&us, info->id, stream_id_raw, seq_num, info->key);
 }
 
-bool uxr_read_session_header(const uxrSessionInfo* info, ucdrBuffer* ub, uint8_t* stream_id_raw, uxrSeqNum* seq_num)
+bool uxr_read_session_header(
+        const uxrSessionInfo* info,
+        ucdrStream* us,
+        uint8_t* stream_id_raw,
+        uxrSeqNum* seq_num)
 {
-    bool must_be_read = ucdr_buffer_remaining(ub) > MAX_HEADER_SIZE;
+    bool must_be_read = ucdr_buffer_remaining(us) > MAX_HEADER_SIZE;
     if(must_be_read)
     {
         uint8_t session_id; uint8_t key[CLIENT_KEY_SIZE];
-        uxr_deserialize_message_header(ub, &session_id, stream_id_raw, seq_num, key);
+        uxr_deserialize_message_header(us, &session_id, stream_id_raw, seq_num, key);
 
         must_be_read = session_id == info->id;
         if(must_be_read)

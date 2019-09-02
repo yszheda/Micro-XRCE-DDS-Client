@@ -22,14 +22,15 @@ extern "C"
 
 #include <uxr/client/core/session/session.h>
 
-struct ucdrBuffer;
+struct ucdrStream;
 
-bool uxr_prepare_stream_to_write_submessage(uxrSession* session,
-                                            uxrStreamId stream_id,
-                                            size_t payload_size,
-                                            struct ucdrBuffer* ub,
-                                            uint8_t submessage_id,
-                                            uint8_t mode);
+bool uxr_prepare_stream_to_write_submessage(
+        uxrSession* session,
+        uxrStreamId stream_id,
+        size_t payload_size,
+        struct ucdrStream* us,
+        uint8_t submessage_id,
+        uint8_t mode);
 
 #ifdef __cplusplus
 }

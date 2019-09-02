@@ -28,20 +28,48 @@ extern "C"
 
 #define ACKNACK_PAYLOAD_SIZE  5
 
-struct ucdrBuffer;
+struct ucdrStream;
 
-void uxr_init_input_reliable_stream(uxrInputReliableStream* stream, uint8_t* buffer, size_t size, uint16_t history, OnGetFragmentationInfo on_get_fragmentation_info);
-void uxr_reset_input_reliable_stream(uxrInputReliableStream* stream);
-bool uxr_receive_reliable_message(uxrInputReliableStream* stream, uint16_t seq_num, uint8_t* buffer, size_t length, bool* message_stored);
-bool uxr_next_input_reliable_buffer_available(uxrInputReliableStream* stream, struct ucdrBuffer* ub, size_t fragment_offset);
+void uxr_init_input_reliable_stream(
+        uxrInputReliableStream* stream,
+        uint8_t* buffer,
+        size_t size,
+        uint16_t history,
+        OnGetFragmentationInfo on_get_fragmentation_info);
 
-uint16_t uxr_compute_acknack(const uxrInputReliableStream* stream, uxrSeqNum* from);
-void uxr_process_heartbeat(uxrInputReliableStream* stream, uxrSeqNum first_seq_num, uxrSeqNum last_seq_num);
+void uxr_reset_input_reliable_stream(
+        uxrInputReliableStream* stream);
 
-bool uxr_is_input_up_to_date(const uxrInputReliableStream* stream);
+bool uxr_receive_reliable_message(
+        uxrInputReliableStream* stream,
+        uint16_t seq_num,
+        uint8_t* buffer,
+        size_t length,
+        bool* message_stored);
 
-uint8_t* uxr_get_input_buffer(const uxrInputReliableStream* stream, size_t history_pos);
-size_t uxr_get_input_buffer_size(const uxrInputReliableStream* stream);
+bool uxr_next_input_reliable_buffer_available(
+        uxrInputReliableStream* stream,
+        struct ucdrStream* us,
+        size_t fragment_offset);
+
+uint16_t uxr_compute_acknack(
+        const uxrInputReliableStream* stream,
+        uxrSeqNum* from);
+
+void uxr_process_heartbeat(
+        uxrInputReliableStream* stream,
+        uxrSeqNum first_seq_num,
+        uxrSeqNum last_seq_num);
+
+bool uxr_is_input_up_to_date(
+        const uxrInputReliableStream* stream);
+
+uint8_t* uxr_get_input_buffer(
+        const uxrInputReliableStream* stream,
+        size_t history_pos);
+
+size_t uxr_get_input_buffer_size(
+        const uxrInputReliableStream* stream);
 
 #ifdef __cplusplus
 }

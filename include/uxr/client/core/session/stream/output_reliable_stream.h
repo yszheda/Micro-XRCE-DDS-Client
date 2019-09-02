@@ -25,10 +25,10 @@ extern "C"
 #include <stddef.h>
 #include <stdbool.h>
 
-struct ucdrBuffer;
+struct ucdrStream;
 struct uxrOutputReliableStream;
 
-typedef void (*OnNewFragment)(struct ucdrBuffer* ub, struct uxrOutputReliableStream* stream);
+typedef void (*OnNewFragment)(struct ucdrStream* us, struct uxrOutputReliableStream* stream);
 
 typedef struct uxrOutputReliableStream
 {

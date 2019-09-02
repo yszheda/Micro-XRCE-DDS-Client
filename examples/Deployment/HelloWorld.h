@@ -41,10 +41,10 @@ typedef struct HelloWorld
 
 } HelloWorld;
 
-struct ucdrBuffer;
+struct ucdrStream;
 
-bool HelloWorld_serialize_topic(struct ucdrBuffer* writer, const HelloWorld* topic);
-bool HelloWorld_deserialize_topic(struct ucdrBuffer* reader, HelloWorld* topic);
+bool HelloWorld_serialize_topic(struct ucdrStream* writer, const HelloWorld* topic);
+bool HelloWorld_deserialize_topic(struct ucdrStream* reader, HelloWorld* topic);
 uint32_t HelloWorld_size_of_topic(const HelloWorld* topic, uint32_t size);
 
 

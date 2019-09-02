@@ -25,7 +25,7 @@ extern "C"
 #include <stdbool.h>
 #include <stddef.h>
 
-struct ucdrBuffer;
+struct ucdrStream;
 
 typedef enum FragmentationInfo
 {

@@ -29,7 +29,7 @@ extern "C"
  * @param session           A uxrSession structure previously initialized.
  * @param stream_id         The output stream identifier where the READ_DATA submessage will be buffered.
  * @param datawriter_id     The identifier of the XRCE DataWriter that will write the topic into the DDS GDS.
- * @param ub_topic          The ucdrBuffer structure used for serializing the topic.
+ * @param us_topic          The ucdrStream structure used for serializing the topic.
  * @param topic_size        The size of the topic in bytes.
  * @return A `request_id` that identifies the request made by the Client.
  *         This could be used in the `uxr_run_session_until_one_status` or `uxr_run_session_until_all_status` functions.
@@ -38,7 +38,7 @@ UXRDLLAPI bool uxr_prepare_output_stream(
         uxrSession* session,
         uxrStreamId stream_id,
         uxrObjectId datawriter_id,
-        struct ucdrBuffer* ub_topic,
+        struct ucdrStream* us_topic,
         uint32_t topic_size);
 
 #ifdef __cplusplus

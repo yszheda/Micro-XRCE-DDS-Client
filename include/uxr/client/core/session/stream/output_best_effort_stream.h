@@ -25,7 +25,8 @@ extern "C"
 #include <stddef.h>
 #include <stdbool.h>
 
-struct ucdrBuffer;
+struct ucdrStream;
+
 typedef struct uxrOutputBestEffortStream
 {
     uint8_t* buffer;
