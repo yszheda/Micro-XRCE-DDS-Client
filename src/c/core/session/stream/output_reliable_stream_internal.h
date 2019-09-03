@@ -33,8 +33,7 @@ void uxr_init_output_reliable_stream(
         uint8_t* buffer,
         size_t size,
         uint16_t history,
-        uint8_t header_offset,
-        OnNewFragment on_new_fragment);
+        uint8_t header_offset);
 
 void uxr_reset_output_reliable_stream(
         uxrOutputReliableStream* stream);

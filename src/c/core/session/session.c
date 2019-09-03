@@ -120,10 +120,6 @@ static void process_timestamp_reply(
         uxrSession* session,
         TIMESTAMP_REPLY_Payload* timestamp);
 
-static void on_new_output_reliable_stream_segment(
-        ucdrStream* us,
-        uxrOutputReliableStream* args);
-
 static FragmentationInfo on_get_fragmentation_info(
         uint8_t* submessage_header);
 
@@ -243,7 +239,7 @@ uxrStreamId uxr_create_output_reliable_stream(
         uint16_t history)
 {
     uint8_t header_offset = uxr_session_header_offset(&session->info);
-    return uxr_add_output_reliable_buffer(&session->streams, buffer, size, history, header_offset, on_new_output_reliable_stream_segment);
+    return uxr_add_output_reliable_buffer(&session->streams, buffer, size, history, header_offset);
 }
 
 uxrStreamId uxr_create_input_best_effort_stream(
@@ -656,7 +652,7 @@ void read_stream(
         {
             uxrInputReliableStream* stream = uxr_get_input_reliable_stream(&session->streams, stream_id.index);
             bool input_buffer_used;
-            if(stream && uxr_receive_reliable_message(stream, seq_num, us->iterator, ucdr_buffer_remaining(us), &input_buffer_used))
+            if(stream && uxr_receive_reliable_message(stream, seq_num, us->iterator, ucdr_remaining_size(us), &input_buffer_used))
             {
                 if(!input_buffer_used)
                 {
@@ -933,22 +929,11 @@ bool uxr_prepare_stream_to_write_submessage(
     return available;
 }
 
-void on_new_output_reliable_stream_segment(
-        ucdrStream* us,
-        uxrOutputReliableStream* stream)
-{
-    uint8_t* last_buffer = uxr_get_output_buffer(stream, stream->last_written % stream->history);
-// TODO (julian): refactor to ucdrStream.
-//    uint8_t last_fragment_flag = FLAG_LAST_FRAGMENT * (last_buffer == us->init);
-//
-//    (void) uxr_buffer_submessage_header(us, SUBMESSAGE_ID_FRAGMENT, (uint16_t)(ucdr_buffer_remaining(us) - SUBHEADER_SIZE), last_fragment_flag);
-}
-
 FragmentationInfo on_get_fragmentation_info(
         uint8_t* submessage_header)
 {
     ucdrStream us;
-    ucdr_init_buffer(&us, submessage_header, SUBHEADER_SIZE);
+    ucdr_init_stream(&us, submessage_header, SUBHEADER_SIZE);
 
     uint8_t id; uint16_t length; uint8_t flags;
     uxr_read_submessage_header(&us, &id, &length, &flags);

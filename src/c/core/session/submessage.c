@@ -23,7 +23,8 @@ bool uxr_buffer_submessage_header(
 bool uxr_read_submessage_header(
         ucdrStream* us,
         uint8_t* submessage_id,
-        uint16_t* length, uint8_t* flags)
+        uint16_t* length,
+        uint8_t* flags)
 {
 // TODO (julian): refactor to ucdrStream.
 //    ucdr_align_to(us, 4);
