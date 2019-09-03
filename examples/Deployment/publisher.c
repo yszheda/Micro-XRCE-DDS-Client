@@ -69,10 +69,10 @@ int main(int args, char** argv)
     {
         HelloWorld topic = {count++, "Hello DDS world!"};
 
-        ucdrBuffer ub;
+        ucdrStream us;
         uint32_t topic_size = HelloWorld_size_of_topic(&topic, 0);
-        uxr_prepare_output_stream(&session, reliable_out, datawriter_id, &ub, topic_size);
-        HelloWorld_serialize_topic(&ub, &topic);
+        uxr_prepare_output_stream(&session, reliable_out, datawriter_id, &us, topic_size);
+        HelloWorld_serialize_topic(&us, &topic);
 
         connected = uxr_run_session_time(&session, 1000);
         if(connected)

@@ -24,7 +24,7 @@
 #include <ucdr/microcdr.h>
 #include <string.h>
 
-bool HelloWorld_serialize_topic(ucdrBuffer* writer, const HelloWorld* topic)
+bool HelloWorld_serialize_topic(ucdrStream* writer, const HelloWorld* topic)
 {
     (void) ucdr_serialize_uint32_t(writer, topic->index);
 
@@ -33,7 +33,7 @@ bool HelloWorld_serialize_topic(ucdrBuffer* writer, const HelloWorld* topic)
     return !writer->error;
 }
 
-bool HelloWorld_deserialize_topic(ucdrBuffer* reader, HelloWorld* topic)
+bool HelloWorld_deserialize_topic(ucdrStream* reader, HelloWorld* topic)
 {
     (void) ucdr_deserialize_uint32_t(reader, &topic->index);
 

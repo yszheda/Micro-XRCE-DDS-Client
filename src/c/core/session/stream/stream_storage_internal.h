@@ -31,7 +31,11 @@ extern "C"
 void uxr_init_stream_storage(uxrStreamStorage* storage);
 void uxr_reset_stream_storage(uxrStreamStorage* storage);
 
-uxrStreamId uxr_add_output_best_effort_buffer(uxrStreamStorage* storage, uint8_t* buffer, size_t size, uint8_t header_offset);
+uxrStreamId uxr_add_output_best_effort_buffer(
+        uxrStreamStorage* storage,
+        uint8_t* buffer,
+        size_t size,
+        uint8_t header_offset);
 
 uxrStreamId uxr_add_output_reliable_buffer(
         uxrStreamStorage* storage,

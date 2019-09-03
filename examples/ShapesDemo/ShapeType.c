@@ -24,7 +24,7 @@
 #include <ucdr/microcdr.h>
 #include <string.h>
 
-bool ShapeType_serialize_topic(ucdrBuffer* writer, const ShapeType* topic)
+bool ShapeType_serialize_topic(ucdrStream* writer, const ShapeType* topic)
 {
     (void) ucdr_serialize_string(writer, topic->color);
 
@@ -37,7 +37,7 @@ bool ShapeType_serialize_topic(ucdrBuffer* writer, const ShapeType* topic)
     return !writer->error;
 }
 
-bool ShapeType_deserialize_topic(ucdrBuffer* reader, ShapeType* topic)
+bool ShapeType_deserialize_topic(ucdrStream* reader, ShapeType* topic)
 {
     (void) ucdr_deserialize_string(reader, topic->color, 255);
 

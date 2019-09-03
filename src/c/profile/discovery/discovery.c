@@ -58,9 +58,9 @@ void uxr_discovery_agents(
 
     uint8_t output_buffer[UXR_UDP_TRANSPORT_MTU_DATAGRAM];
     ucdrStream us;
-    ucdr_init_buffer(&us, output_buffer, UXR_UDP_TRANSPORT_MTU_DATAGRAM);
+    ucdr_init_stream(&us, output_buffer, UXR_UDP_TRANSPORT_MTU_DATAGRAM);
     write_get_info_message(&us);
-    size_t message_length = ucdr_buffer_length(&us);
+    size_t message_length = ucdr_size(&us);
 
     uxrUDPTransportDatagram transport;
     if(uxr_init_udp_transport_datagram(&transport))
@@ -113,7 +113,7 @@ bool listen_info_message(
         UXR_DEBUG_PRINT_MESSAGE(UXR_RECV, input_buffer, length, 0);
 
         ucdrStream us;
-        ucdr_init_buffer(&us, input_buffer, (uint32_t)length);
+        ucdr_init_stream(&us, input_buffer, (uint32_t)length);
         if(read_info_headers(&us))
         {
             (void) read_info_message(&us, callback);
