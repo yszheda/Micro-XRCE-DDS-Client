@@ -30,10 +30,9 @@ struct ucdrStream;
 typedef struct uxrOutputBestEffortStream
 {
     uint8_t* buffer;
-    size_t writer;
     size_t size;
-    uint8_t offset;
-
+    size_t offset;
+    size_t header_offset;
     uxrSeqNum last_send;
 
 } uxrOutputBestEffortStream;

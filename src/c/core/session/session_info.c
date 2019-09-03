@@ -92,8 +92,7 @@ void uxr_read_delete_session_status(uxrSessionInfo* info, ucdrStream* us)
 void uxr_stamp_create_session_header(const uxrSessionInfo* info, uint8_t* buffer)
 {
     ucdrStream us;
-    ucdr_init_buffer(&us, buffer, MAX_HEADER_SIZE);
-
+    ucdr_init_stream(&us, buffer, MAX_HEADER_SIZE);
     uxr_serialize_message_header(&us, info->id & SESSION_ID_WITHOUT_CLIENT_KEY, 0, 0, info->key);
 }
 
@@ -104,8 +103,7 @@ void uxr_stamp_session_header(
         uint8_t* buffer)
 {
     ucdrStream us;
-    ucdr_init_buffer(&us, buffer, MAX_HEADER_SIZE);
-
+    ucdr_init_stream(&us, buffer, MAX_HEADER_SIZE);
     uxr_serialize_message_header(&us, info->id, stream_id_raw, seq_num, info->key);
 }
 
@@ -115,7 +113,7 @@ bool uxr_read_session_header(
         uint8_t* stream_id_raw,
         uxrSeqNum* seq_num)
 {
-    bool must_be_read = ucdr_buffer_remaining(us) > MAX_HEADER_SIZE;
+    bool must_be_read = ucdr_remaining_size(us) > MAX_HEADER_SIZE;
     if(must_be_read)
     {
         uint8_t session_id; uint8_t key[CLIENT_KEY_SIZE];

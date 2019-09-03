@@ -901,7 +901,7 @@ bool uxr_prepare_stream_to_write_submessage(
         uint8_t mode)
 {
     bool available = false;
-    size_t submessage_size = SUBHEADER_SIZE + payload_size + uxr_submessage_padding(payload_size);
+    size_t submessage_size = SUBHEADER_SIZE + payload_size;
 
     switch(stream_id.type)
     {

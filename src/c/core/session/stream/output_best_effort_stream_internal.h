@@ -31,7 +31,7 @@ void uxr_init_output_best_effort_stream(
         uxrOutputBestEffortStream* stream,
         uint8_t* buffer,
         size_t size,
-        uint8_t offset);
+        size_t header_offset);
 
 void uxr_reset_output_best_effort_stream(
         uxrOutputBestEffortStream* stream);
