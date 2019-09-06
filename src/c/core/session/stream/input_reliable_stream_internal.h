@@ -1,4 +1,4 @@
-// Copyright 2017 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _SRC_C_CORE_SESSION_INPUT_STREAM_RELIABLE_STREAM_INTERNAL_H_
-#define _SRC_C_CORE_SESSION_INPUT_STREAM_RELIABLE_STREAM_INTERNAL_H_
+#ifndef SRC_C_CORE_SESSION_INPUT_STREAM_RELIABLE_STREAM_INTERNAL_H_
+#define SRC_C_CORE_SESSION_INPUT_STREAM_RELIABLE_STREAM_INTERNAL_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -33,9 +33,9 @@ struct ucdrStream;
 void uxr_init_input_reliable_stream(
         uxrInputReliableStream* stream,
         uint8_t* buffer,
-        size_t size,
-        uint16_t history,
-        OnGetFragmentationInfo on_get_fragmentation_info);
+        size_t max_message_size,
+        size_t max_fragment_size,
+        uint16_t history);
 
 void uxr_reset_input_reliable_stream(
         uxrInputReliableStream* stream);
@@ -49,8 +49,7 @@ bool uxr_receive_reliable_message(
 
 bool uxr_next_input_reliable_buffer_available(
         uxrInputReliableStream* stream,
-        struct ucdrStream* us,
-        size_t fragment_offset);
+        struct ucdrStream* us);
 
 uint16_t uxr_compute_acknack(
         const uxrInputReliableStream* stream,
@@ -68,11 +67,8 @@ uint8_t* uxr_get_input_buffer(
         const uxrInputReliableStream* stream,
         size_t history_pos);
 
-size_t uxr_get_input_buffer_size(
-        const uxrInputReliableStream* stream);
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif // _SRC_C_CORE_SESSION_INPUT_STREAM_RELIABLE_STREAM_INTERNAL_H_
+#endif // SRC_C_CORE_SESSION_INPUT_STREAM_RELIABLE_STREAM_INTERNAL_H_

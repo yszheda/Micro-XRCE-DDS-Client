@@ -169,12 +169,13 @@ UXRDLLAPI uxrStreamId uxr_create_output_best_effort_stream(
  * @brief Creates and initializes an output reliable stream.
  *        The maximum number of output reliable streams is set by the `CONFIG_MAX_OUTPUT_RELIABLE_STREAMS`
  *        variable at `client.config` file.
- * @param session   A uxrSession structure previously initialized.
- * @param buffer    The memory block where the messages will be written.
- * @param size      The buffer size.
- * @param history   The amount of messages that the stream is able to manage.
- *                  The buffer size will be splitted into blocks according to this value.
- *                  This value shall be power of 2.
+ * @param session           A uxrSession structure previously initialized.
+ * @param buffer            The memory block where the messages will be written.
+ * @param max_message_size  The maximum message size.
+ * @param max_fragment_size The maximum fragment size.
+ * @param history           The amount of messages that the stream is able to manage.
+ *                          The buffer size will be splitted into blocks according to this value.
+ *                          This value shall be power of 2.
  * @return  A uxrStreamId which could by used for managing the stream.
  */
 UXRDLLAPI uxrStreamId uxr_create_output_reliable_stream(
@@ -197,18 +198,21 @@ UXRDLLAPI uxrStreamId uxr_create_input_best_effort_stream(uxrSession* session);
  * @brief Creates and initializes an input reliable stream.
  *        The maximum number of input reliable streams is set by the `CONFIG_MAX_INPUT_RELIABLE_STREAMS`
  *        variable at `client.config` file.
- * @param session   A uxrSession structure previously initialized.
- * @param buffer    The memory block where the messages will be written.
- * @param size      The buffer size.
- * @param history   The amount of messages that the stream is able to manage.
- *                  The buffer size will be splitted into blocks according to this value.
- *                  This value shall be power of 2.
+ * @param session           A uxrSession structure previously initialized.
+ * @param buffer            The memory block where the messages will be written.
+ * @param max_message_size  The maximum message size.
+ * @param max_fragment_size The maximum fragment size.
+ * @param size              The buffer size.
+ * @param history           The amount of messages that the stream is able to manage.
+ *                          The buffer size will be splitted into blocks according to this value.
+ *                          This value shall be power of 2.
  * @return  A uxrStreamId which could by used for managing the stream.
  */
 UXRDLLAPI uxrStreamId uxr_create_input_reliable_stream(
         uxrSession* session,
         uint8_t* buffer,
-        size_t size,
+        size_t max_message_size,
+        size_t max_fragment_size,
         uint16_t history);
 
 /**

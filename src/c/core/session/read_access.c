@@ -154,9 +154,11 @@ inline void read_format_data(
         uint16_t request_id)
 {
     (void) length;
-// TODO (julian): refactor to ucdrStream.
-//    us->last_data_size = 8; //reset alignment (as if we were created a new ucdrStream)
 
+    ucdrStream topic;
+    ucdr_clone_stream(&topic, us);
+    ucdr_promote_stream(&topic, SUBHEADER_SIZE);
+    ucdr_reset_offset(&topic);
     session->on_topic(session, object_id, request_id, stream_id, us, session->on_topic_args);
 }
 

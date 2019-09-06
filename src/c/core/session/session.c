@@ -120,9 +120,6 @@ static void process_timestamp_reply(
         uxrSession* session,
         TIMESTAMP_REPLY_Payload* timestamp);
 
-static FragmentationInfo on_get_fragmentation_info(
-        uint8_t* submessage_header);
-
 static bool run_session_until_sync(
         uxrSession* session,
         int timeout);
@@ -252,10 +249,11 @@ uxrStreamId uxr_create_input_best_effort_stream(
 uxrStreamId uxr_create_input_reliable_stream(
         uxrSession* session,
         uint8_t* buffer,
-        size_t size,
+        size_t max_message_size,
+        size_t max_fragment_size,
         uint16_t history)
 {
-    return uxr_add_input_reliable_buffer(&session->streams, buffer, size, history, on_get_fragmentation_info);
+    return uxr_add_input_reliable_buffer(&session->streams, buffer, max_message_size, max_fragment_size, history);
 }
 
 bool uxr_run_session_time(
@@ -661,7 +659,7 @@ void read_stream(
                 }
 
                 ucdrStream next_mb;
-                while(uxr_next_input_reliable_buffer_available(stream, &next_mb, SUBHEADER_SIZE))
+                while(uxr_next_input_reliable_buffer_available(stream, &next_mb))
                 {
                     read_submessage_list(session, &next_mb, stream_id);
                 }
@@ -682,7 +680,10 @@ void read_submessage_list(
     uint8_t id; uint16_t length; uint8_t flags;
     while(uxr_read_submessage_header(submessages, &id, &length, &flags))
     {
-        read_submessage(session, submessages, id, stream_id, length, flags);
+        ucdrStream submsg;
+        ucdr_clone_stream(&submsg, submessages);
+        read_submessage(session, &submsg, id, stream_id, length, flags);
+        ucdr_promote_stream(submessages, length);
     }
 }
 
@@ -928,27 +929,6 @@ bool uxr_prepare_stream_to_write_submessage(
     }
 
     return available;
-}
-
-FragmentationInfo on_get_fragmentation_info(
-        uint8_t* submessage_header)
-{
-    ucdrStream us;
-    ucdr_init_stream(&us, submessage_header, SUBHEADER_SIZE);
-
-    uint8_t id; uint16_t length; uint8_t flags;
-    uxr_read_submessage_header(&us, &id, &length, &flags);
-
-    FragmentationInfo fragmentation_info;
-    if(SUBMESSAGE_ID_FRAGMENT == id)
-    {
-        fragmentation_info = FLAG_LAST_FRAGMENT & flags ? LAST_FRAGMENT : INTERMEDIATE_FRAGMENT;
-    }
-    else
-    {
-        fragmentation_info = NO_FRAGMENTED;
-    }
-    return fragmentation_info;
 }
 
 bool run_session_until_sync(

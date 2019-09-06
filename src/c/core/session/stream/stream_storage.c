@@ -66,7 +66,8 @@ uxrStreamId uxr_add_output_reliable_buffer(
     return uxr_stream_id(index, UXR_RELIABLE_STREAM, UXR_OUTPUT_STREAM);
 }
 
-uxrStreamId uxr_add_input_best_effort_buffer(uxrStreamStorage* storage)
+uxrStreamId uxr_add_input_best_effort_buffer(
+        uxrStreamStorage* storage)
 {
     uint8_t index = storage->input_best_effort_size++;
     //TODO: assert for index
@@ -75,16 +76,23 @@ uxrStreamId uxr_add_input_best_effort_buffer(uxrStreamStorage* storage)
     return uxr_stream_id(index, UXR_BEST_EFFORT_STREAM, UXR_INPUT_STREAM);
 }
 
-uxrStreamId uxr_add_input_reliable_buffer(uxrStreamStorage* storage, uint8_t* buffer, size_t size, uint16_t history, OnGetFragmentationInfo on_get_fragmentation_info)
+uxrStreamId uxr_add_input_reliable_buffer(
+        uxrStreamStorage* storage,
+        uint8_t* buffer,
+        size_t max_message_size,
+        size_t max_fragment_size,
+        uint16_t history)
 {
     uint8_t index = storage->input_reliable_size++;
     //TODO: assert for index
     uxrInputReliableStream* stream = &storage->input_reliable[index];
-    uxr_init_input_reliable_stream(stream, buffer, size, history, on_get_fragmentation_info);
+    uxr_init_input_reliable_stream(stream, buffer, max_message_size, max_fragment_size, history);
     return uxr_stream_id(index, UXR_RELIABLE_STREAM, UXR_INPUT_STREAM);
 }
 
-uxrOutputBestEffortStream* uxr_get_output_best_effort_stream(uxrStreamStorage* storage, uint8_t index)
+uxrOutputBestEffortStream* uxr_get_output_best_effort_stream(
+        uxrStreamStorage* storage,
+        uint8_t index)
 {
     if(index < storage->output_best_effort_size)
     {
@@ -93,7 +101,9 @@ uxrOutputBestEffortStream* uxr_get_output_best_effort_stream(uxrStreamStorage* s
     return NULL;
 }
 
-uxrOutputReliableStream* uxr_get_output_reliable_stream(uxrStreamStorage* storage, uint8_t index)
+uxrOutputReliableStream* uxr_get_output_reliable_stream(
+        uxrStreamStorage* storage,
+        uint8_t index)
 {
     if(index < storage->output_reliable_size)
     {
@@ -102,7 +112,9 @@ uxrOutputReliableStream* uxr_get_output_reliable_stream(uxrStreamStorage* storag
     return NULL;
 }
 
-uxrInputBestEffortStream* uxr_get_input_best_effort_stream(uxrStreamStorage* storage, uint8_t index)
+uxrInputBestEffortStream* uxr_get_input_best_effort_stream(
+        uxrStreamStorage* storage,
+        uint8_t index)
 {
     if(index < storage->input_best_effort_size)
     {
@@ -111,7 +123,9 @@ uxrInputBestEffortStream* uxr_get_input_best_effort_stream(uxrStreamStorage* sto
     return NULL;
 }
 
-uxrInputReliableStream* uxr_get_input_reliable_stream(uxrStreamStorage* storage, uint8_t index)
+uxrInputReliableStream* uxr_get_input_reliable_stream(
+        uxrStreamStorage* storage,
+        uint8_t index)
 {
     if(index < storage->input_reliable_size)
     {
@@ -120,7 +134,8 @@ uxrInputReliableStream* uxr_get_input_reliable_stream(uxrStreamStorage* storage,
     return NULL;
 }
 
-bool uxr_output_streams_confirmed(const uxrStreamStorage* storage)
+bool uxr_output_streams_confirmed(
+        const uxrStreamStorage* storage)
 {
     bool up_to_date = true;
     for(unsigned i = 0; i < storage->output_reliable_size && up_to_date; ++i)

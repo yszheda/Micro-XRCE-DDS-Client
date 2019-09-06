@@ -1,4 +1,4 @@
-// Copyright 2017 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _UXR_CLIENT_CORE_SESSION_STREAM_INPUT_RELIABLE_STREAM_H_
-#define _UXR_CLIENT_CORE_SESSION_STREAM_INPUT_RELIABLE_STREAM_H_
+#ifndef UXR_CLIENT_CORE_SESSION_STREAM_INPUT_RELIABLE_STREAM_H_
+#define UXR_CLIENT_CORE_SESSION_STREAM_INPUT_RELIABLE_STREAM_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -40,13 +40,15 @@ typedef FragmentationInfo (*OnGetFragmentationInfo)(uint8_t* buffer);
 typedef struct uxrInputReliableStream
 {
     uint8_t* buffer;
-    size_t size;
+    size_t max_message_size;
+    size_t max_fragment_size;
     uint16_t history;
+
+    size_t offset;
+    size_t iterator;
 
     uxrSeqNum last_handled;
     uxrSeqNum last_announced;
-
-    OnGetFragmentationInfo on_get_fragmentation_info;
 
 } uxrInputReliableStream;
 
@@ -54,4 +56,4 @@ typedef struct uxrInputReliableStream
 }
 #endif
 
-#endif // _UXR_CLIENT_CORE_SESSION_STREAM_INPUT_RELIABLE_STREAM_H_
+#endif // UXR_CLIENT_CORE_SESSION_STREAM_INPUT_RELIABLE_STREAM_H_

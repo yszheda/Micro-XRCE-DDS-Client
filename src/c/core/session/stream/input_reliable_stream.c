@@ -1,6 +1,7 @@
 #include "seq_num_internal.h"
 #include "input_reliable_stream_internal.h"
 #include "common_reliable_stream_internal.h"
+#include "../submessage_internal.h"
 #include <ucdr/microcdr.h>
 
 #include <string.h>
@@ -12,9 +13,8 @@ static bool check_last_fragment(
 static uxrSeqNum uxr_get_first_unacked(
         const uxrInputReliableStream* stream);
 
-static bool on_full_input_buffer(
-        ucdrStream* us,
-        void* args);
+static FragmentationInfo uxr_get_fragmentation_info(
+        uint8_t* buffer);
 
 //==================================================================
 //                             PUBLIC
@@ -22,15 +22,15 @@ static bool on_full_input_buffer(
 void uxr_init_input_reliable_stream(
         uxrInputReliableStream* stream,
         uint8_t* buffer,
-        size_t size,
-        uint16_t history,
-        OnGetFragmentationInfo on_get_fragmentation_info)
+        size_t max_message_size,
+        size_t max_fragment_size,
+        uint16_t history)
 {
     // assert for history (must be 2^)
     stream->buffer = buffer;
-    stream->size = size;
+    stream->max_message_size = max_message_size;
+    stream->max_fragment_size = max_fragment_size;
     stream->history = history;
-    stream->on_get_fragmentation_info = on_get_fragmentation_info;
 
     uxr_reset_input_reliable_stream(stream);
 }
@@ -62,7 +62,7 @@ bool uxr_receive_reliable_message(
     if(0 > uxr_seq_num_cmp(stream->last_handled, seq_num) && 0 <= uxr_seq_num_cmp(last_history, seq_num))
     {
         /* Process the message */
-        FragmentationInfo fragmentation_info = stream->on_get_fragmentation_info(buffer);
+        FragmentationInfo fragmentation_info = uxr_get_fragmentation_info(buffer);
         uxrSeqNum next = uxr_seq_num_add(stream->last_handled, 1);
 
         if((NO_FRAGMENTED == fragmentation_info) && (seq_num == next))
@@ -77,7 +77,7 @@ bool uxr_receive_reliable_message(
             uint8_t* internal_buffer = uxr_get_input_buffer(stream, seq_num % stream->history);
             if(0 == uxr_get_reliable_buffer_length(internal_buffer))
             {
-                memcpy(internal_buffer, buffer, length);
+                memcpy(internal_buffer + INTERNAL_RELIABLE_BUFFER_OFFSET, buffer, length);
                 uxr_set_reliable_buffer_length(internal_buffer, length);
                 *message_stored = true;
 
@@ -103,20 +103,18 @@ bool uxr_receive_reliable_message(
 
 bool uxr_next_input_reliable_buffer_available(
         uxrInputReliableStream* stream,
-        ucdrStream* us,
-        size_t fragment_offset)
+        ucdrStream* us)
 {
     uxrSeqNum next = uxr_seq_num_add(stream->last_handled, 1);
     uint8_t* internal_buffer = uxr_get_input_buffer(stream, next % stream->history);
     size_t length = uxr_get_reliable_buffer_length(internal_buffer);
-    bool available_to_read = 0 != length;
+    bool available_to_read = (0 != length);
     if(available_to_read)
     {
-        FragmentationInfo fragmentation_info = stream->on_get_fragmentation_info(internal_buffer);
+        FragmentationInfo fragmentation_info = uxr_get_fragmentation_info(internal_buffer + INTERNAL_RELIABLE_BUFFER_OFFSET);
         if(NO_FRAGMENTED == fragmentation_info)
         {
-// TODO (julian): refactor to ucdrStream.
-//            ucdr_init_buffer(us, internal_buffer, (uint32_t)length);
+            ucdr_init_stream(us, internal_buffer + INTERNAL_RELIABLE_BUFFER_OFFSET, length);
             uxr_set_reliable_buffer_length(internal_buffer, 0);
             stream->last_handled = next;
         }
@@ -126,11 +124,33 @@ bool uxr_next_input_reliable_buffer_available(
             available_to_read = check_last_fragment(stream, &last);
             if(available_to_read)
             {
+                memcpy(stream->buffer, internal_buffer + INTERNAL_RELIABLE_BUFFER_OFFSET + SUBHEADER_SIZE, length - SUBHEADER_SIZE);
                 uxr_set_reliable_buffer_length(internal_buffer, 0);
-// TODO (julian): refactor to ucdrStream.
-//                ucdr_init_buffer(us, internal_buffer + fragment_offset, (uint32_t)(length - fragment_offset));
-//                ucdr_set_on_full_buffer_callback(us, on_full_input_buffer, stream);
+                stream->offset = length - SUBHEADER_SIZE;
+                do
+                {
+                    next = uxr_seq_num_add(next, 1);
+                    internal_buffer = uxr_get_input_buffer(stream, next % stream->history);
+                    length = uxr_get_reliable_buffer_length(internal_buffer);
+
+                    if ((length + stream->offset) > stream->max_message_size)
+                    {
+                        stream->last_handled = last;
+                        available_to_read = false;
+                        break;
+                    }
+
+                    memcpy(stream->buffer + stream->offset, internal_buffer + INTERNAL_RELIABLE_BUFFER_OFFSET + SUBHEADER_SIZE, length - SUBHEADER_SIZE);
+                    uxr_set_reliable_buffer_length(internal_buffer, 0);
+                    stream->offset += (length - SUBHEADER_SIZE);
+
+                } while (last != next);
                 stream->last_handled = last;
+
+                if (available_to_read)
+                {
+                    ucdr_init_stream(us, stream->buffer, stream->offset);
+                }
             }
         }
     }
@@ -183,13 +203,7 @@ uint8_t* uxr_get_input_buffer(
         const uxrInputReliableStream* stream,
         size_t history_pos)
 {
-    return uxr_get_reliable_buffer(stream->buffer, stream->size, stream->history, history_pos);
-}
-
-size_t uxr_get_input_buffer_size(
-        const uxrInputReliableStream* stream)
-{
-    return uxr_get_reliable_buffer_size(stream->size, stream->history);
+    return stream->buffer + stream->max_message_size + (stream->max_fragment_size * history_pos);
 }
 
 //==================================================================
@@ -206,11 +220,11 @@ bool check_last_fragment(
     {
         next = uxr_seq_num_add(next, 1);
         uint8_t* next_buffer = uxr_get_input_buffer(stream, next % stream->history);
-        more_messages = 0 != uxr_get_reliable_buffer_length(next_buffer);
+        more_messages = (0 != uxr_get_reliable_buffer_length(next_buffer));
         if(more_messages)
         {
-            FragmentationInfo next_fragmentation_info = stream->on_get_fragmentation_info(next_buffer);
-            more_messages = INTERMEDIATE_FRAGMENT == next_fragmentation_info;
+            FragmentationInfo next_fragmentation_info = uxr_get_fragmentation_info(next_buffer + INTERNAL_RELIABLE_BUFFER_OFFSET);
+            more_messages = (INTERMEDIATE_FRAGMENT == next_fragmentation_info);
             if(LAST_FRAGMENT == next_fragmentation_info)
             {
                 found = true;
@@ -242,24 +256,23 @@ uxrSeqNum uxr_get_first_unacked(
     return first_unknown;
 }
 
-bool on_full_input_buffer(
-        ucdrStream* us,
-        void* args)
+FragmentationInfo uxr_get_fragmentation_info(
+        uint8_t* buffer)
 {
-//    uxrInputReliableStream* stream = (uxrInputReliableStream*) args;
-//
-//    size_t slot_pos = (size_t)(us->init - stream->buffer) / (stream->size / stream->history);
-//    uint8_t* buffer = uxr_get_input_buffer(stream, slot_pos % stream->history);
-//    uint8_t* next_buffer = uxr_get_input_buffer(stream, (slot_pos + 1) % stream->history);
-//    size_t offset = (size_t)(us->init - buffer);
-//
-//    uint8_t* next_init = next_buffer + offset;
-//    size_t next_length = uxr_get_reliable_buffer_length(next_buffer) - offset;
-//    uxr_set_reliable_buffer_length(next_buffer, 0);
-//
-//    ucdr_init_buffer(us, next_init, (uint32_t)next_length);
-//    ucdr_set_on_full_buffer_callback(us, on_full_input_buffer, stream);
+    ucdrStream us;
+    ucdr_init_stream(&us, buffer, SUBHEADER_SIZE);
 
-    return false;
+    uint8_t id; uint16_t length; uint8_t flags;
+    uxr_read_submessage_header(&us, &id, &length, &flags);
+
+    FragmentationInfo fragmentation_info;
+    if(SUBMESSAGE_ID_FRAGMENT == id)
+    {
+        fragmentation_info = FLAG_LAST_FRAGMENT & flags ? LAST_FRAGMENT : INTERMEDIATE_FRAGMENT;
+    }
+    else
+    {
+        fragmentation_info = NO_FRAGMENTED;
+    }
+    return fragmentation_info;
 }
-

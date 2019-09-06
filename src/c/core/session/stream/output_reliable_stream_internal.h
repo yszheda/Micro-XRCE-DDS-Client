@@ -1,4 +1,4 @@
-// Copyright 2017 Proyectos y Sistemas de Mantenimiento SL (eProsima).
+// Copyright 2019 Proyectos y Sistemas de Mantenimiento SL (eProsima).
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef _SRC_C_CORE_SESSION_STREAM_OUTPUT_RELIABLE_STREAM_INTERNAL_H_
-#define _SRC_C_CORE_SESSION_STREAM_OUTPUT_RELIABLE_STREAM_INTERNAL_H_
+#ifndef SRC_C_CORE_SESSION_STREAM_OUTPUT_RELIABLE_STREAM_INTERNAL_H_
+#define SRC_C_CORE_SESSION_STREAM_OUTPUT_RELIABLE_STREAM_INTERNAL_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -77,4 +77,4 @@ uint8_t* uxr_get_output_buffer(
 }
 #endif
 
-#endif // _SRC_C_CORE_SESSION_STREAM_OUTPUT_RELIABLE_STREAM_INTERNAL_H_
+#endif // SRC_C_CORE_SESSION_STREAM_OUTPUT_RELIABLE_STREAM_INTERNAL_H_
