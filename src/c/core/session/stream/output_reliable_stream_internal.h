@@ -28,10 +28,9 @@ extern "C"
 
 #define HEARTBEAT_PAYLOAD_SIZE 5
 
-void uxr_init_output_reliable_stream(
-        uxrOutputReliableStream* stream,
+void uxr_init_output_reliable_stream(uxrOutputReliableStream* stream,
         uint8_t* buffer,
-        size_t size,
+        size_t max_message_size, size_t max_fragment_size,
         uint16_t history,
         uint8_t header_offset);
 
@@ -40,8 +39,7 @@ void uxr_reset_output_reliable_stream(
 
 bool uxr_prepare_reliable_buffer_to_write(
         uxrOutputReliableStream* stream,
-        size_t size,
-        size_t fragment_offset,
+        size_t submessage_size,
         struct ucdrStream* us);
 
 bool uxr_prepare_next_reliable_buffer_to_send(
@@ -74,9 +72,6 @@ bool uxr_is_output_up_to_date(
 uint8_t* uxr_get_output_buffer(
         const uxrOutputReliableStream* stream,
         size_t history_pos);
-
-size_t uxr_get_output_buffer_size(
-        const uxrOutputReliableStream* stream);
 
 #ifdef __cplusplus
 }

@@ -40,7 +40,8 @@ uxrStreamId uxr_add_output_best_effort_buffer(
 uxrStreamId uxr_add_output_reliable_buffer(
         uxrStreamStorage* storage,
         uint8_t* buffer,
-        size_t size,
+        size_t max_message_size,
+        size_t max_fragment_size,
         uint16_t history,
         uint8_t header_offset);
 

@@ -33,11 +33,14 @@ typedef void (*OnNewFragment)(struct ucdrStream* us, struct uxrOutputReliableStr
 typedef struct uxrOutputReliableStream
 {
     uint8_t* buffer;
-    size_t size;
+    size_t max_message_size;
+    size_t max_fragment_size;
     uint16_t history;
-    uint8_t offset;
+    uint8_t header_offset;
 
-    uxrSeqNum last_written;
+    size_t offset;
+    size_t iterator;
+
     uxrSeqNum last_sent;
     uxrSeqNum last_acknown;
 

@@ -25,8 +25,7 @@ bool uxr_prepare_output_stream(
         uxr_init_base_object_request(&session->info, datawriter_id, &payload.base);
         (void) uxr_serialize_WRITE_DATA_Payload_Data(us, &payload);
 
-// TODO (julian): refactor to ucdrStream.
-//        us->last_data_size = 8; //reset alignment (as if we were created a new ucdrStream)
+        ucdr_init_stream(us, us->buffer_info.data + us->offset, us->buffer_info.size - us->offset);
     }
 
     return !us->error;

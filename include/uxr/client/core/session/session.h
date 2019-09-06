@@ -180,7 +180,8 @@ UXRDLLAPI uxrStreamId uxr_create_output_best_effort_stream(
 UXRDLLAPI uxrStreamId uxr_create_output_reliable_stream(
         uxrSession* session,
         uint8_t* buffer,
-        size_t size,
+        size_t max_message_size,
+        size_t max_fragment_size,
         uint16_t history);
 
 /**

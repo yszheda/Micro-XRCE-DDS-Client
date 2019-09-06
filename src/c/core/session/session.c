@@ -235,11 +235,12 @@ uxrStreamId uxr_create_output_best_effort_stream(
 uxrStreamId uxr_create_output_reliable_stream(
         uxrSession* session,
         uint8_t* buffer,
-        size_t size,
+        size_t max_message_size,
+        size_t max_fragment_size,
         uint16_t history)
 {
     uint8_t header_offset = uxr_session_header_offset(&session->info);
-    return uxr_add_output_reliable_buffer(&session->streams, buffer, size, history, header_offset);
+    return uxr_add_output_reliable_buffer(&session->streams, buffer, max_message_size, max_fragment_size, history, header_offset);
 }
 
 uxrStreamId uxr_create_input_best_effort_stream(
@@ -914,7 +915,7 @@ bool uxr_prepare_stream_to_write_submessage(
         case UXR_RELIABLE_STREAM:
         {
             uxrOutputReliableStream* stream = uxr_get_output_reliable_stream(&session->streams, stream_id.index);
-            available = stream && uxr_prepare_reliable_buffer_to_write(stream, submessage_size, SUBHEADER_SIZE, us);
+            available = stream && uxr_prepare_reliable_buffer_to_write(stream, submessage_size, us);
             break;
         }
         default:

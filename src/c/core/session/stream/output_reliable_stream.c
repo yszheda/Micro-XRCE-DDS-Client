@@ -6,6 +6,7 @@
 #include "seq_num_internal.h"
 #include "output_reliable_stream_internal.h"
 #include "common_reliable_stream_internal.h"
+#include "../submessage_internal.h"
 #include <ucdr/microcdr.h>
 
 #define MIN_HEARTBEAT_TIME_INTERVAL ((int64_t) UXR_CONFIG_MIN_HEARTBEAT_TIME_INTERVAL) // ms
@@ -19,16 +20,18 @@
 void uxr_init_output_reliable_stream(
         uxrOutputReliableStream* stream,
         uint8_t* buffer,
-        size_t size,
+        size_t max_message_size,
+        size_t max_fragment_size,
         uint16_t history,
         uint8_t header_offset)
 {
     // assert for history (must be 2^)
 
     stream->buffer = buffer;
-    stream->size = size;
-    stream->offset = header_offset;
+    stream->max_message_size = max_message_size;
+    stream->max_fragment_size = max_fragment_size;
     stream->history = history;
+    stream->header_offset = header_offset;
 
     uxr_reset_output_reliable_stream(stream);
 }
@@ -38,11 +41,13 @@ void uxr_reset_output_reliable_stream(
 {
     for(size_t i = 0; i < stream->history; i++)
     {
-        uint8_t* internal_buffer = uxr_get_output_buffer(stream, i);
-        uxr_set_reliable_buffer_length(internal_buffer, stream->offset);
+        uint8_t* buffer = uxr_get_output_buffer(stream, i);
+        uxr_set_reliable_buffer_length(buffer, 0);
     }
 
-    stream->last_written = 0;
+    stream->offset = 0;
+    stream->iterator = 0;
+
     stream->last_sent = SEQ_NUM_MAX;
     stream->last_acknown = SEQ_NUM_MAX;
 
@@ -53,85 +58,18 @@ void uxr_reset_output_reliable_stream(
 
 bool uxr_prepare_reliable_buffer_to_write(
         uxrOutputReliableStream* stream,
-        size_t length,
-        size_t fragment_offset,
+        size_t submessage_size,
         ucdrStream* us)
 {
-    bool available_to_write = false;
-    const size_t block_size = uxr_get_output_buffer_size(stream);
-
-    uint8_t* buffer = uxr_get_output_buffer(stream, stream->last_written % stream->history);
-    size_t buffer_offset = uxr_get_reliable_buffer_length(buffer);
-
-    /* Check if the message fit in the current buffer */
-    if(buffer_offset + length <= block_size)
+    bool rv = false;
+    submessage_size += ucdr_alignment(stream->offset, 4);
+    if ((0 == stream->iterator) && (submessage_size + stream->offset <= stream->max_message_size))
     {
-        /* Check if there is space in the stream history to write */
-        uxrSeqNum last_available = uxr_seq_num_add(stream->last_acknown, stream->history);
-        available_to_write = (0 >= uxr_seq_num_cmp(stream->last_written, last_available));
-        if(available_to_write)
-        {
-            uxr_set_reliable_buffer_length(buffer, buffer_offset + length);
-            ucdr_init_stream(us, buffer + buffer_offset, length);
-        }
+        rv = true;
+        ucdr_init_stream_offset(us, stream->buffer, submessage_size + stream->offset, stream->offset);
+        stream->offset += submessage_size;
     }
-    /* Check if the message fit in a new empty buffer */
-    else if(stream->offset + length <= block_size)
-    {
-        /* Check if there is space in the stream history to write */
-        uxrSeqNum next = uxr_seq_num_add(stream->last_written, 1);
-        uxrSeqNum last_available = uxr_seq_num_add(stream->last_acknown, stream->history);
-        available_to_write = (0 >= uxr_seq_num_cmp(next, last_available));
-        if(available_to_write)
-        {
-            stream->last_written = next;
-            buffer = uxr_get_output_buffer(stream, next % stream->history);
-            uxr_set_reliable_buffer_length(buffer, stream->offset + length);
-            ucdr_init_stream(us, buffer + stream->offset, length);
-        }
-    }
-    /* Check if the message fit in a fragmented message */
-    else
-    {
-        size_t remaining_blocks = uxr_seq_num_sub(stream->last_acknown, stream->last_written) % stream->history;
-        uxrSeqNum init_seq_num = stream->last_written;
-
-        /* Check if the current buffer free space is too small */
-        if(buffer_offset + fragment_offset >= block_size)
-        {
-            init_seq_num = uxr_seq_num_add(stream->last_written, 1);
-            buffer = uxr_get_output_buffer(stream, init_seq_num % stream->history);
-            buffer_offset = uxr_get_reliable_buffer_length(buffer);
-            remaining_blocks = (0 < remaining_blocks) ? remaining_blocks - 1 : 0;
-        }
-
-        size_t available_block_size = block_size - (stream->offset + fragment_offset + UCDR_BUFFER_OFFSET);
-        size_t first_fragment_size = block_size - (buffer_offset + fragment_offset + UCDR_BUFFER_OFFSET);
-        size_t remaining_size = length - first_fragment_size;
-        size_t last_fragment_size = (remaining_size % available_block_size);
-        size_t necessary_blocks = (size_t)(0 < first_fragment_size) + (remaining_size / available_block_size) + (size_t)(0 < last_fragment_size);
-
-        available_to_write = necessary_blocks <= remaining_blocks;
-        if(available_to_write)
-        {
-            stream->last_written = init_seq_num;
-            ucdr_init_stream(us, buffer + (buffer_offset + fragment_offset), block_size - (buffer_offset + fragment_offset));
-
-            for(size_t i = 0; i < necessary_blocks - 1; ++i)
-            {
-                buffer = uxr_get_output_buffer(stream, stream->last_written % stream->history);
-                uxr_set_reliable_buffer_length(buffer, block_size);
-                stream->last_written = uxr_seq_num_add(stream->last_written, 1);
-                ucdr_append_buffer(us, buffer + stream->offset + fragment_offset, block_size - (stream->offset - fragment_offset));
-            }
-
-            buffer = uxr_get_output_buffer(stream, stream->last_written % stream->history);
-            ucdr_append_buffer(us, buffer + stream->offset + fragment_offset, last_fragment_size + UCDR_BUFFER_OFFSET);
-            uxr_set_reliable_buffer_length(buffer, stream->offset + fragment_offset + last_fragment_size);
-        }
-    }
-
-    return available_to_write;
+    return rv;
 }
 
 bool uxr_prepare_next_reliable_buffer_to_send(
@@ -140,23 +78,49 @@ bool uxr_prepare_next_reliable_buffer_to_send(
         size_t* length,
         uxrSeqNum* seq_num)
 {
-    *seq_num = uxr_seq_num_add(stream->last_sent, 1);
-    *buffer = uxr_get_output_buffer(stream, *seq_num % stream->history);
-    *length = uxr_get_reliable_buffer_length(*buffer);
-
-    bool data_to_send = 0 >= uxr_seq_num_cmp(*seq_num, stream->last_written)
-                        && *length > stream->offset
-                        && uxr_seq_num_sub(stream->last_sent, stream->last_acknown) != stream->history;
-    if(data_to_send)
+    bool rv = false;
+    const uxrSeqNum next = uxr_seq_num_add(stream->last_sent, 1);
+    if ((0 != stream->offset) && (0 != uxr_seq_num_sub(stream->last_acknown, next) % stream->history))
     {
-        stream->last_sent = *seq_num;
-        if(stream->last_sent == stream->last_written)
-        {
-            stream->last_written = uxr_seq_num_add(stream->last_written, 1);
-        }
-    }
+        rv = true;
+        *buffer = uxr_get_output_buffer(stream, *seq_num % stream->history);
+        const uint8_t* data = stream->buffer + stream->iterator;
+        size_t data_size;
+        size_t data_offset;
 
-    return data_to_send;
+        if ((0 == stream->iterator) && (stream->offset <= stream->max_fragment_size))
+        {
+            data_size = stream->offset;
+            data_offset = stream->header_offset;
+            stream->offset = 0;
+        }
+        else
+        {
+            data_size = (stream->offset - stream->iterator);
+            data_offset = (size_t)(stream->header_offset + SUBHEADER_SIZE);
+            uint8_t flag = 0;
+            if (stream->max_fragment_size >= (data_offset + data_size))
+            {
+                stream->iterator = 0;
+                stream->offset = 0;
+                flag = FLAG_LAST_FRAGMENT;
+            }
+            else
+            {
+                data_size = stream->max_fragment_size - data_offset;
+                stream->iterator += data_size;
+            }
+            ucdrStream us;
+            ucdr_init_stream_offset(&us, *buffer, stream->max_fragment_size, stream->header_offset);
+            uxr_buffer_submessage_header(&us, SUBMESSAGE_ID_FRAGMENT, (uint16_t)(data_size), flag);
+        }
+        stream->last_sent = next;
+        *seq_num = stream->last_sent;
+        *length = data_offset + data_size;
+        uxr_set_reliable_buffer_length(*buffer, *length);
+        memcpy(*buffer + data_offset, data, data_size);
+    }
+    return rv;
 }
 
 bool uxr_update_output_stream_heartbeat_timestamp(
@@ -212,7 +176,7 @@ bool uxr_next_reliable_nack_buffer_to_send(
             {
                 *buffer = uxr_get_output_buffer(stream, *seq_num_it % stream->history);
                 *length = uxr_get_reliable_buffer_length(*buffer);
-                it_updated = *length != stream->offset;
+                it_updated = (*length != 0);
             }
         }
 
@@ -236,7 +200,7 @@ void uxr_process_acknack(
     {
         stream->last_acknown = uxr_seq_num_add(stream->last_acknown, 1);
         uint8_t* internal_buffer = uxr_get_output_buffer(stream, stream->last_acknown % stream->history);
-        uxr_set_reliable_buffer_length(internal_buffer, stream->offset); /* clear buffer */
+        uxr_set_reliable_buffer_length(internal_buffer, 0); /* clear buffer */
     }
 
     stream->send_lost = (0 < bitmap);
@@ -255,11 +219,5 @@ uint8_t* uxr_get_output_buffer(
         const uxrOutputReliableStream* stream,
         size_t history_pos)
 {
-    return uxr_get_reliable_buffer(stream->buffer, stream->size, stream->history, history_pos);
-}
-
-size_t uxr_get_output_buffer_size(
-        const uxrOutputReliableStream* stream)
-{
-    return uxr_get_reliable_buffer_size(stream->size, stream->history);
+    return stream->buffer + stream->max_message_size + (stream->max_fragment_size * history_pos);
 }

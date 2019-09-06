@@ -54,14 +54,15 @@ uxrStreamId uxr_add_output_best_effort_buffer(
 uxrStreamId uxr_add_output_reliable_buffer(
         uxrStreamStorage* storage,
         uint8_t* buffer,
-        size_t size,
+        size_t max_message_size,
+        size_t max_fragment_size,
         uint16_t history,
         uint8_t header_offset)
 {
     uint8_t index = storage->output_reliable_size++;
     //TODO: assert for index
     uxrOutputReliableStream* stream = &storage->output_reliable[index];
-    uxr_init_output_reliable_stream(stream, buffer, size, history, header_offset);
+    uxr_init_output_reliable_stream(stream, buffer, max_message_size, max_fragment_size, history, header_offset);
     return uxr_stream_id(index, UXR_RELIABLE_STREAM, UXR_OUTPUT_STREAM);
 }
 
