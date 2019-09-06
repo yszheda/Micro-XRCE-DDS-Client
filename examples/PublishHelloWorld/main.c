@@ -21,8 +21,10 @@
 #include <string.h> //strcmp
 #include <stdlib.h> //atoi
 
-#define STREAM_HISTORY  8
-#define BUFFER_SIZE     UXR_CONFIG_UDP_TRANSPORT_MTU * STREAM_HISTORY
+#define MAX_MESSAGE_SIZE    UXR_CONFIG_UDP_TRANSPORT_MTU * 2
+#define MAX_FRAGMENT_SIZE   UXR_CONFIG_UDP_TRANSPORT_MTU
+#define STREAM_HISTORY      8
+#define BUFFER_SIZE         MAX_MESSAGE_SIZE + (MAX_FRAGMENT_SIZE * STREAM_HISTORY)
 
 int main(int args, char** argv)
 {
@@ -57,10 +59,10 @@ int main(int args, char** argv)
 
     // Streams
     uint8_t output_reliable_stream_buffer[BUFFER_SIZE];
-    uxrStreamId reliable_out = uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer, BUFFER_SIZE, STREAM_HISTORY);
+    uxrStreamId reliable_out = uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer, MAX_MESSAGE_SIZE, MAX_FRAGMENT_SIZE, STREAM_HISTORY);
 
     uint8_t input_reliable_stream_buffer[BUFFER_SIZE];
-    uxr_create_input_reliable_stream(&session, input_reliable_stream_buffer, BUFFER_SIZE, STREAM_HISTORY);
+    uxr_create_input_reliable_stream(&session, input_reliable_stream_buffer, MAX_MESSAGE_SIZE, MAX_FRAGMENT_SIZE, STREAM_HISTORY);
 
     // Create entities
     uxrObjectId participant_id = uxr_object_id(0x01, UXR_PARTICIPANT_ID);

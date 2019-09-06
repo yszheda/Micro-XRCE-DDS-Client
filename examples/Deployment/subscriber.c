@@ -19,8 +19,10 @@
 #include <stdlib.h> //atoi
 #include <stdio.h>
 
-#define STREAM_HISTORY  8
-#define BUFFER_SIZE     UXR_CONFIG_UDP_TRANSPORT_MTU * STREAM_HISTORY
+#define MAX_MESSAGE_SIZE    UXR_CONFIG_UDP_TRANSPORT_MTU * 2
+#define MAX_FRAGMENT_SIZE   UXR_CONFIG_UDP_TRANSPORT_MTU
+#define STREAM_HISTORY      8
+#define BUFFER_SIZE         MAX_MESSAGE_SIZE + (MAX_FRAGMENT_SIZE * STREAM_HISTORY)
 
 void on_topic(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrBuffer* ub, void* args)
 {
@@ -64,24 +66,24 @@ int main(int args, char** argv)
 
     // Streams
     uint8_t output_reliable_stream_buffer[BUFFER_SIZE];
-    uxrStreamId reliable_out = uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer, BUFFER_SIZE, STREAM_HISTORY);
+    uxrStreamId reliable_out = uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer, MAX_MESSAGE_SIZE, MAX_FRAGMENT_SIZE, STREAM_HISTORY);
 
     uint8_t input_reliable_stream_buffer[BUFFER_SIZE];
-    uxrStreamId reliable_in = uxr_create_input_reliable_stream(&session, input_reliable_stream_buffer, BUFFER_SIZE, STREAM_HISTORY);
+    uxr_create_input_reliable_stream(&session, input_reliable_stream_buffer, MAX_MESSAGE_SIZE, MAX_FRAGMENT_SIZE, STREAM_HISTORY);
 
     // Request topics
     uxrDeliveryControl delivery_control = {0};
     delivery_control.max_samples = UXR_MAX_SAMPLES_UNLIMITED;
 
     uxrObjectId datareader_id = uxr_object_id((uint16_t)atoi(argv[4]), UXR_DATAREADER_ID);
-    uint16_t read_data_req = uxr_buffer_request_data(&session, reliable_out, datareader_id, reliable_in, &delivery_control);
+//    uint16_t read_data_req = uxr_buffer_request_data(&session, reliable_out, datareader_id, reliable_in, &delivery_control);
 
     // Read topics
     bool connected = true;
     while(connected)
     {
         uint8_t read_data_status;
-        connected = uxr_run_session_until_all_status(&session, UXR_TIMEOUT_INF, &read_data_req, &read_data_status, 1);
+//        connected = uxr_run_session_until_all_status(&session, UXR_TIMEOUT_INF, &read_data_req, &read_data_status, 1);
     }
 
     // Delete resources

@@ -42,7 +42,9 @@
 
 // Stream buffers
 #define MAX_HISTORY        16
-#define MAX_BUFFER_SIZE    MAX_TRANSPORT_MTU * MAX_HISTORY
+#define MAX_MESSAGE_SIZE   MAX_TRANSPORT_MTU * 2
+#define MAX_FRAGMENT_SIZE  MAX_TRANSPORT_MTU
+#define MAX_BUFFER_SIZE    MAX_MESSAGE_SIZE + (MAX_TRANSPORT_MTU * MAX_HISTORY)
 
 static int shapes_demo_error = 0;
 
@@ -171,11 +173,11 @@ int main(int args, char** argv)
     }
     for(int i = 0; i < UXR_CONFIG_MAX_OUTPUT_RELIABLE_STREAMS; ++i)
     {
-        (void) uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer + MAX_BUFFER_SIZE * i, comm->mtu * history, history);
+        (void) uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer + MAX_BUFFER_SIZE * i, MAX_MESSAGE_SIZE, MAX_FRAGMENT_SIZE, history);
     }
     for(int i = 0; i < UXR_CONFIG_MAX_INPUT_RELIABLE_STREAMS; ++i)
     {
-        (void) uxr_create_input_reliable_stream(&session, input_reliable_stream_buffer + MAX_BUFFER_SIZE * i, comm->mtu * history, history);
+        (void) uxr_create_input_reliable_stream(&session, input_reliable_stream_buffer + MAX_BUFFER_SIZE * i, MAX_MESSAGE_SIZE, MAX_FRAGMENT_SIZE, history);
     }
 
     uxrStreamId default_output = uxr_stream_id(0, UXR_RELIABLE_STREAM, UXR_OUTPUT_STREAM);

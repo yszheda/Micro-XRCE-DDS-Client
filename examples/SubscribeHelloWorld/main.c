@@ -20,8 +20,10 @@
 #include <string.h> //strcmp
 #include <stdlib.h> //atoi
 
-#define STREAM_HISTORY  8
-#define BUFFER_SIZE     UXR_CONFIG_UDP_TRANSPORT_MTU * STREAM_HISTORY
+#define MAX_MESSAGE_SIZE    UXR_CONFIG_UDP_TRANSPORT_MTU * 2
+#define MAX_FRAGMENT_SIZE   UXR_CONFIG_UDP_TRANSPORT_MTU
+#define STREAM_HISTORY      8
+#define BUFFER_SIZE         MAX_MESSAGE_SIZE + (MAX_FRAGMENT_SIZE * STREAM_HISTORY)
 
 void on_topic(uxrSession* session, uxrObjectId object_id, uint16_t request_id, uxrStreamId stream_id, struct ucdrStream* us, void* args)
 {
@@ -73,10 +75,10 @@ int main(int args, char** argv)
 
     // Streams
     uint8_t output_reliable_stream_buffer[BUFFER_SIZE];
-    uxrStreamId reliable_out = uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer, BUFFER_SIZE, STREAM_HISTORY);
+    uxrStreamId reliable_out = uxr_create_output_reliable_stream(&session, output_reliable_stream_buffer, MAX_MESSAGE_SIZE, MAX_FRAGMENT_SIZE, STREAM_HISTORY);
 
     uint8_t input_reliable_stream_buffer[BUFFER_SIZE];
-    uxrStreamId reliable_in = uxr_create_input_reliable_stream(&session, input_reliable_stream_buffer, BUFFER_SIZE, STREAM_HISTORY);
+    uxrStreamId reliable_in = uxr_create_input_reliable_stream(&session, input_reliable_stream_buffer, MAX_MESSAGE_SIZE, MAX_FRAGMENT_SIZE, STREAM_HISTORY);
 
     // Create entities
     uxrObjectId participant_id = uxr_object_id(0x01, UXR_PARTICIPANT_ID);
@@ -92,8 +94,8 @@ int main(int args, char** argv)
     uxrObjectId topic_id = uxr_object_id(0x01, UXR_TOPIC_ID);
     const char* topic_xml = "<dds>"
                                 "<topic>"
-                                    "<name>HelloWorldTopic</name>"
-                                    "<dataType>HelloWorld</dataType>"
+                                    "<name>HelloMicroWorldTopic</name>"
+                                    "<dataType>HelloMicroWorld</dataType>"
                                 "</topic>"
                             "</dds>";
     uint16_t topic_req = uxr_buffer_create_topic_xml(&session, reliable_out, topic_id, participant_id, topic_xml, UXR_REPLACE);
@@ -107,8 +109,8 @@ int main(int args, char** argv)
                                      "<data_reader>"
                                          "<topic>"
                                              "<kind>NO_KEY</kind>"
-                                             "<name>HelloWorldTopic</name>"
-                                             "<dataType>HelloWorld</dataType>"
+                                             "<name>HelloMicroWorldTopic</name>"
+                                             "<dataType>HelloMicroWorld</dataType>"
                                          "</topic>"
                                      "</data_reader>"
                                  "</dds>";
