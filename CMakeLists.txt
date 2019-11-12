@@ -104,6 +104,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Generic")
     if(PLATFORM_NAME STREQUAL "nuttx")
         set(PLATFORM_NAME_NUTTX ON)
         set(TRANSPORT_TYPES "UDP" "TCP" "SERIAL")
+    elseif(PLATFORM_NAME STREQUAL "CrazyFlie")
+        set(PLATFORM_NAME_CRAZYFLIE ON)
+        set(TRANSPORT_TYPES "SERIAL")
     endif()
 endif()
 
@@ -125,6 +128,11 @@ foreach(TRANS_TYPE ${TRANSPORT_TYPES})
             set(${TRANS_TYPE}_SRCS
                 src/c/profile/transport/${TT}/${TT}_transport.c
                 src/c/profile/transport/${TT}/${TT}_transport_linux.c
+                )
+        elseif(PLATFORM_NAME_CRAZYFLIE)
+            set(${TRANS_TYPE}_SRCS
+                src/c/profile/transport/${TT}/${TT}_transport.c
+                src/c/profile/transport/${TT}/${TT}_transport_crazyflie.c
                 )
         endif()
     endif()
@@ -161,7 +169,7 @@ set(SRCS
     src/c/core/serialization/xrce_protocol.c
     src/c/core/serialization/xrce_header.c
     src/c/core/serialization/xrce_subheader.c
-    src/c/util/time.c
+    src/c/util/time_crazyflie.c
     src/c/core/session/common_create_entities.c
     src/c/core/session/create_entities_ref.c
     src/c/core/session/create_entities_xml.c
