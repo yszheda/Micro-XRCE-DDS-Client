@@ -4,12 +4,11 @@
 
 #include <unistd.h>
 #include <errno.h>
-//#include "queue.h"
 
-#include "../../../../../../../src/modules/interface/crtp.h"
+#include <crtp.h>
 
-#include "../../../../../../../src/hal/interface/syslink.h"
-#include "../../../../../../../src/hal/interface/radiolink.h"
+#include <syslink.h>
+#include <radiolink.h>
 #include "string.h"
 
 
