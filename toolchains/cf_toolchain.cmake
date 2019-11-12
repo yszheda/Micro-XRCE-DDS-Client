@@ -1,5 +1,6 @@
 include(CMakeForceCompiler)
 include_directories(SYSTEM ${CMAKE_SYSROOT}/src/modules/interface)
+include_directories(SYSTEM ${CMAKE_SYSROOT}/vendor/Micro-CDR/include)
 
 
 set(CMAKE_SYSTEM_NAME Generic)
@@ -20,6 +21,6 @@ separate_arguments(ARCH_OPT_FLAGS)
 
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
 
-set(CMAKE_C_FLAGS_INIT "-std=gnu11 -Dunix=1 -mfloat-abi=hard" CACHE STRING "" FORCE)
+set(CMAKE_C_FLAGS_INIT "-std=c11 -DARM_MATH_CM4 -D__FPU_PRESENT=1 -D__TARGET_FPU_VFP  -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mcpu=cortex-m4 -mthumb -ffunction-sections -fdata-sections" CACHE STRING "" FORCE)
 
 set(__BIG_ENDIAN__ 0)
